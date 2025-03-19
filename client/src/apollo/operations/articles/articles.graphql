@@ -1,0 +1,77 @@
+query GetArticles($offset: Int, $limit: Int, $authorId: ID) {
+  articles(offset: $offset, limit: $limit, authorId: $authorId) {
+    id
+    title
+    content
+    createdAt
+    updatedAt
+    author {
+      id
+      username
+      avatar
+    }
+    likesCount
+  }
+}
+
+query GetArticle($id: ID!) {
+  article(id: $id) {
+    id
+    title
+    content
+    createdAt
+    updatedAt
+    author {
+      id
+      username
+      avatar
+    }
+    comments {
+      id
+      content
+      createdAt
+      author {
+        id
+        username
+        avatar
+      }
+    }
+    likes {
+      id
+      user {
+        id
+        username
+      }
+    }
+    likesCount
+  }
+}
+
+mutation CreateArticle($input: ArticleInput!) {
+  createArticle(input: $input) {
+    id
+    title
+    content
+    createdAt
+  }
+}
+
+mutation UpdateArticle($id: ID!, $input: ArticleUpdateInput!) {
+  updateArticle(id: $id, input: $input) {
+    id
+    title
+    content
+    updatedAt
+  }
+}
+
+mutation DeleteArticle($id: ID!) {
+  deleteArticle(id: $id)
+}
+
+mutation ToggleLike($articleId: ID!) {
+  toggleLike(articleId: $articleId) {
+    id
+    likesCount
+  }
+} 

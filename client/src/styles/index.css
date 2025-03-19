@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-league-blue text-white;
+  }
+  
+  h1 {
+    @apply text-3xl font-bold text-league-gold;
+  }
+  
+  h2 {
+    @apply text-2xl font-semibold text-league-gold;
+  }
+  
+  h3 {
+    @apply text-xl font-semibold text-league-teal;
+  }
+  
+  a {
+    @apply text-league-teal hover:text-league-gold transition-colors;
+  }
+  
+  button {
+    @apply px-4 py-2 bg-league-gold text-league-dark font-semibold rounded 
+    hover:bg-league-teal transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  input, textarea {
+    @apply px-3 py-2 bg-league-dark text-white border border-league-gold rounded
+    focus:outline-none focus:ring-2 focus:ring-league-teal;
+  }
+} 
