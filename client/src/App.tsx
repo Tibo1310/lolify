@@ -4,9 +4,11 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ArticlePage from './pages/ArticlePage';
+import ArticlesPage from './pages/ArticlesPage';
 import CreateArticlePage from './pages/CreateArticlePage';
 import EditArticlePage from './pages/EditArticlePage';
 import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -19,6 +21,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="articles" element={<ArticlesPage />} />
           <Route path="articles/:id" element={<ArticlePage />} />
           <Route 
             path="articles/create" 
@@ -36,11 +39,12 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          <Route path="profile/:username" element={<ProfilePage />} />
           <Route 
-            path="profile" 
+            path="settings" 
             element={
               <ProtectedRoute>
-                <ProfilePage />
+                <SettingsPage />
               </ProtectedRoute>
             } 
           />

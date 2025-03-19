@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { formatDate } from '../utils/formatters';
+import { formatDate } from '../utils/dateUtils';
 
 interface Author {
   id: string;

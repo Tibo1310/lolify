@@ -2,25 +2,32 @@ import { Link } from 'react-router-dom';
 
 const NotFoundPage = () => {
   return (
-    <div className="text-center py-12">
-      <h1 className="text-6xl font-bold mb-4">404</h1>
-      <h2 className="text-2xl mb-8">Page non trouvée</h2>
-      
+    <div className="max-w-4xl mx-auto text-center py-16">
       <div className="mb-8">
-        <p className="text-gray-300 mb-2">
-          La page que vous recherchez semble ne pas exister.
-        </p>
-        <p className="text-gray-300">
-          Vérifiez l'URL ou revenez à la page d'accueil.
-        </p>
+        <span className="text-9xl font-bold text-league-gold">404</span>
       </div>
       
-      <Link 
-        to="/" 
-        className="inline-block bg-league-gold text-league-dark font-bold py-3 px-6 rounded-lg hover:bg-league-teal transition-colors"
-      >
-        Retour à l'accueil
-      </Link>
+      <h1 className="text-3xl font-bold mb-4">Page introuvable</h1>
+      
+      <p className="text-gray-300 text-lg mb-8">
+        La page que vous recherchez n'existe pas ou a été déplacée.
+      </p>
+      
+      <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <Link 
+          to="/"
+          className="bg-league-gold text-league-dark px-6 py-3 rounded-lg font-bold hover:bg-league-teal transition-colors"
+        >
+          Retour à l'accueil
+        </Link>
+        
+        <Link 
+          to="/articles"
+          className="bg-league-dark border border-league-gold text-white px-6 py-3 rounded-lg font-bold hover:bg-league-dark/70 transition-colors"
+        >
+          Parcourir les articles
+        </Link>
+      </div>
     </div>
   );
 };
