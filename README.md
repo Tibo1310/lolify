@@ -8,7 +8,7 @@ Ce projet est en cours de développement.
 
 ## Installation
 
-Instructions d'installation à venir.
+Instructions d'installation à venir..
 
 ## Utilisation
 
