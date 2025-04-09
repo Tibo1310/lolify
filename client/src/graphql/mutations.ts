@@ -89,12 +89,31 @@ export const TOGGLE_LIKE_MUTATION = gql`
   mutation ToggleLike($articleId: ID!) {
     toggleLike(articleId: $articleId) {
       id
+      title
+      content
+      createdAt
+      updatedAt
       likesCount
+      author {
+        id
+        username
+        avatar
+      }
       likes {
         id
         user {
           id
           username
+        }
+      }
+      comments {
+        id
+        content
+        createdAt
+        author {
+          id
+          username
+          avatar
         }
       }
     }
