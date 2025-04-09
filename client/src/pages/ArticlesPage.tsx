@@ -45,7 +45,7 @@ const ArticlesPage = () => {
       limit: 50,
       search: debouncedSearch || undefined
     },
-  });
+  }); 
   
   // Trier les articles en fonction du filtre actif
   const sortedArticles = data?.articles ? [...data.articles].sort((a, b) => {

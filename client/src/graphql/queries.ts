@@ -90,4 +90,16 @@ export const GET_ME = gql`
       avatar
     }
   }
+`;
+
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($username: String!) {
+    user(username: $username) {
+      id
+      username
+      email
+      createdAt
+      avatar
+    }
+  }
 `; 

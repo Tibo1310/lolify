@@ -71,9 +71,16 @@ input CommentInput {
   articleId: ID!
 }
 
+input UpdateProfileInput {
+  username: String
+  email: String
+  currentPassword: String!
+  newPassword: String
+}
+
 type Query {
   me: User
-  user(id: ID!): User
+  user(id: ID, username: String): User
   users: [User!]!
   article(id: ID!): Article
   articles(offset: Int, limit: Int, authorId: ID, search: String): [Article!]!
@@ -83,6 +90,9 @@ type Query {
 type Mutation {
   register(input: RegisterInput!): AuthPayload!
   login(input: LoginInput!): AuthPayload!
+  
+  updateProfile(input: UpdateProfileInput!): User!
+  deleteAccount(password: String!): Boolean!
   
   createArticle(input: ArticleInput!): Article!
   updateArticle(id: ID!, input: ArticleUpdateInput!): Article!
