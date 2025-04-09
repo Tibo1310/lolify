@@ -55,9 +55,12 @@ export const UPDATE_ARTICLE_MUTATION = gql`
   }
 `;
 
-export const DELETE_ARTICLE_MUTATION = gql`
+export const DELETE_ARTICLE = gql`
   mutation DeleteArticle($id: ID!) {
-    deleteArticle(id: $id)
+    deleteArticle(id: $id) {
+      id
+      title
+    }
   }
 `;
 
