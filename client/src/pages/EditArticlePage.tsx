@@ -1,8 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../context/AuthContext';
-// Nous importerons ces hooks une fois générés
-// import { useGetArticleQuery, useUpdateArticleMutation } from '../apollo/generated';
+import { GET_ARTICLE } from '../graphql/queries';
+import { UPDATE_ARTICLE_MUTATION } from '../graphql/mutations';
+
+interface Article {
+  id: string;
+  title: string;
+  content: string;
+  author: {
+    id: string;
+    username: string;
+    avatar: string | null;
+  };
+}
+
+interface ArticleData {
+  article: Article;
+}
 
 const EditArticlePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,77 +28,30 @@ const EditArticlePage = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isAuthorized, setIsAuthorized] = useState(true); // Simulé pour le développement
   
-  // Simuler les données en attendant la génération des hooks
-  const articleLoading = false;
-  const articleError = null;
+  // Fetch article data
+  const { loading: articleLoading, error: articleError, data } = useQuery<ArticleData>(GET_ARTICLE, {
+    variables: { id },
+    skip: !id
+  });
   
-  // Article simulé pour le développement
-  const article = {
-    id: id || 'article-1',
-    title: 'Comment devenir meilleur à League of Legends',
-    content: `# Les bases pour s'améliorer
-
-League of Legends est un jeu complexe qui nécessite beaucoup de pratique et de connaissances pour progresser. Voici quelques conseils pour vous aider à vous améliorer :
-
-## 1. Maîtrisez quelques champions
-
-Au lieu d'essayer de jouer tous les champions, concentrez-vous sur 2-3 champions par rôle. Cela vous permettra de vous concentrer sur la macro du jeu plutôt que sur les mécaniques spécifiques à chaque champion.
-
-## 2. Améliorez votre farm
-
-Le farm est l'un des aspects les plus importants du jeu. Essayez de viser 7-8 CS par minute.
-
-## 3. Regardez des replays de vos parties
-
-Analyser vos erreurs est la meilleure façon de vous améliorer. Prenez le temps de regarder vos replays et d'identifier les moments où vous auriez pu faire mieux.
-
-## 4. La vision est cruciale
-
-Peu importe votre rôle, achetez et placez des wards. La vision donne des informations précieuses et peut sauver des vies.`,
-    createdAt: new Date(2023, 10, 15).toISOString(),
-    updatedAt: new Date(2023, 10, 15).toISOString(),
-    author: {
-      id: user?.id || 'user-1',
-      username: user?.username || 'ProGamer123',
-      avatar: null
-    }
-  };
-  
-  // Simuler la mutation en attendant la génération des hooks
-  const [updateArticle, { loading: updateLoading }] = [
-    async ({ variables }: any) => {
-      // Simuler une mise à jour d'article réussie
-      if (title && content) {
-        // Simulation d'une mise à jour réussie
-        return {
-          data: {
-            updateArticle: {
-              id: id,
-              title: variables.input.title,
-              content: variables.input.content,
-              updatedAt: new Date().toISOString()
-            }
-          }
-        };
-      } else {
-        throw new Error('Le titre et le contenu sont obligatoires');
-      }
+  // Update article mutation
+  const [updateArticle, { loading: updateLoading }] = useMutation(UPDATE_ARTICLE_MUTATION, {
+    onCompleted: () => {
+      navigate(`/articles/${id}`);
     },
-    { loading: false }
-  ];
-  
-  // Charger les données de l'article
-  useEffect(() => {
-    if (article) {
-      setTitle(article.title);
-      setContent(article.content);
-      
-      // Vérifier si l'utilisateur est l'auteur de l'article
-      setIsAuthorized(user?.id === article.author.id);
+    onError: (error) => {
+      setError(error.message);
     }
-  }, [article, user]);
+  });
+  
+  // Load article data when available
+  useEffect(() => {
+    if (data?.article) {
+      setTitle(data.article.title);
+      setContent(data.article.content);
+    }
+  }, [data]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,21 +69,15 @@ Peu importe votre rôle, achetez et placez des wards. La vision donne des inform
     }
     
     try {
-      // Appeler la mutation de mise à jour d'article
-      const result = await updateArticle({
+      await updateArticle({
         variables: {
           id,
           input: {
-            title,
-            content
+            title: title.trim(),
+            content: content.trim()
           }
         }
       });
-
-      // Rediriger vers la page de l'article mis à jour
-      if (result?.data?.updateArticle) {
-        navigate(`/articles/${id}`);
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     }
@@ -139,6 +102,7 @@ Peu importe votre rôle, achetez et placez des wards. La vision donne des inform
   }
   
   // Si l'utilisateur n'est pas autorisé à modifier cet article
+  const isAuthorized = user?.id === data?.article?.author.id;
   if (!isAuthorized) {
     return (
       <div className="text-center py-12">
@@ -198,9 +162,9 @@ Peu importe votre rôle, achetez et placez des wards. La vision donne des inform
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full"
-              placeholder="Titre de l'article"
+              className="w-full p-3 bg-league-dark text-white border border-league-gold/50 rounded-lg focus:border-league-gold focus:ring-2 focus:ring-league-gold/50"
               required
+              disabled={updateLoading}
             />
           </div>
           
@@ -212,34 +176,46 @@ Peu importe votre rôle, achetez et placez des wards. La vision donne des inform
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full h-64"
-              placeholder="Contenu de l'article..."
+              className="w-full h-96 p-3 bg-league-dark text-white border border-league-gold/50 rounded-lg focus:border-league-gold focus:ring-2 focus:ring-league-gold/50 font-mono"
               required
+              disabled={updateLoading}
             ></textarea>
+            
+            <div className="mt-2">
+              <details className="text-sm text-gray-400">
+                <summary className="cursor-pointer hover:text-gray-300">Aide Markdown</summary>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {markdownTips.map((tip, index) => (
+                    <div key={index} className="p-2 bg-league-dark/40 rounded">
+                      <p className="font-medium text-gray-300">{tip.description}</p>
+                      <code className="text-xs text-league-gold">{tip.syntax}</code>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            </div>
           </div>
           
           <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-league-gold text-league-dark px-4 py-2 rounded font-semibold hover:bg-league-teal transition-colors"
+              className="bg-league-gold text-league-dark font-semibold px-6 py-2 rounded-lg hover:bg-league-teal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={updateLoading}
             >
-              {updateLoading ? 'Mise à jour en cours...' : 'Mettre à jour'}
+              {updateLoading ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Mise à jour en cours...
+                </span>
+              ) : (
+                'Mettre à jour'
+              )}
             </button>
           </div>
         </form>
-      </div>
-      
-      <div className="bg-league-dark/60 border border-league-gold/20 rounded-lg p-4">
-        <h3 className="font-semibold mb-2">Aide Markdown</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-          {markdownTips.map((tip, index) => (
-            <div key={index} className="border border-league-gold/10 rounded p-2">
-              <p className="text-league-gold mb-1">{tip.description}</p>
-              <code className="bg-league-dark p-1 rounded block">{tip.syntax}</code>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

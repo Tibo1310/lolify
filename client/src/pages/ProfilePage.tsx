@@ -50,16 +50,6 @@ const ProfilePage = () => {
     skip: !username
   });
 
-  // Requête pour obtenir les articles de l'utilisateur
-  const { loading: articlesLoading, data: articlesData } = useQuery(GET_ARTICLES, {
-    variables: { 
-      authorId: profileData?.user?.id,
-      limit: 50,
-      offset: 0
-    },
-    skip: !profileData?.user?.id
-  });
-
   // Mutation pour mettre à jour le profil
   const [updateProfile] = useMutation(UPDATE_PROFILE, {
     onCompleted: () => {
@@ -128,13 +118,13 @@ const ProfilePage = () => {
     }
   };
 
-  const sortedArticles = articlesData?.articles ? [...articlesData.articles].sort((a, b) => {
+  const sortedArticles = profileData?.user?.articles ? [...profileData.user.articles].sort((a, b) => {
     const dateA = new Date(a.createdAt).getTime();
     const dateB = new Date(b.createdAt).getTime();
     return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
   }) : [];
 
-  if (profileLoading || articlesLoading) {
+  if (profileLoading) {
     return (
       <div className="flex justify-center my-12">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-league-gold"></div>

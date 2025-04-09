@@ -145,11 +145,17 @@ export const articleResolvers = {
         throw new Error('Vous n\'êtes pas autorisé à supprimer cet article');
       }
 
+      // Stocker les informations de l'article avant de le supprimer
+      const deletedArticleInfo = {
+        id: article.id,
+        title: article.title
+      };
+
       await prisma.article.delete({
         where: { id },
       });
 
-      return true;
+      return deletedArticleInfo;
     },
 
     toggleLike: async (

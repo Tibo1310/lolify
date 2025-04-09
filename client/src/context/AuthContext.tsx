@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useQuery } from '@apollo/client';
+import { GET_ME } from '../graphql/queries';
 // Nous importerons useMeLazyQuery une fois qu'il sera généré
 // import { useMeLazyQuery } from '../apollo/generated';
 
@@ -23,64 +25,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   // Nous utiliserons cette query une fois générée
   // const [getMe] = useMeLazyQuery();
 
-  useEffect(() => {
-    // Vérifier le token stocké au chargement
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+  const { data: userData, loading: userLoading } = useQuery(GET_ME, {
+    skip: !token,
+  });
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+  useEffect(() => {
+    if (!userLoading && userData?.me) {
+      setUser(userData.me);
       setIsAuthenticated(true);
     }
-
-    const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      
-      if (token) {
-        try {
-          // Simulation en attendant la génération du code
-          // const { data } = await getMe();
-          
-          // if (data?.me) {
-          //   setUser(data.me);
-          // } else {
-          //   // Si l'API retourne null, le token n'est plus valide
-          //   localStorage.removeItem('token');
-          // }
-        } catch (error) {
-          console.error("Erreur lors de la vérification de l'authentification:", error);
-          localStorage.removeItem('token');
-        }
-      }
-      
-      setLoading(false);
-    };
-
-    checkAuth();
-  // }, [getMe]);
-  }, []);
+    setLoading(userLoading);
+  }, [userData, userLoading]);
 
   const login = (newToken: string, userData: User) => {
+    localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(userData);
     setIsAuthenticated(true);
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
   };
 
   return (

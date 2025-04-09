@@ -87,6 +87,11 @@ type Query {
   comments(articleId: ID!): [Comment!]!
 }
 
+type DeletedArticle {
+  id: ID!
+  title: String!
+}
+
 type Mutation {
   register(input: RegisterInput!): AuthPayload!
   login(input: LoginInput!): AuthPayload!
@@ -96,7 +101,7 @@ type Mutation {
   
   createArticle(input: ArticleInput!): Article!
   updateArticle(id: ID!, input: ArticleUpdateInput!): Article!
-  deleteArticle(id: ID!): Boolean!
+  deleteArticle(id: ID!): DeletedArticle!
   
   addComment(input: CommentInput!): Comment!
   deleteComment(id: ID!): Boolean!
