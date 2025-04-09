@@ -8,7 +8,7 @@ const ProfilePage = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   
   // Données simulées pour le développement
   const profileUser = {

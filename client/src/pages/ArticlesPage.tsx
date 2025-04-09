@@ -6,7 +6,7 @@ import ArticleCard from '../components/ArticleCard';
 const ArticlesPage = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('latest');
   

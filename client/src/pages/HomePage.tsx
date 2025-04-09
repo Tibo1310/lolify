@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 const HomePage = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   
   // Articles simulés pour le développement
   const recentArticles = [

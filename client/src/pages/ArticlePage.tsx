@@ -11,7 +11,6 @@ const ArticlePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const [commentContent, setCommentContent] = useState('');
   
   // Simuler les données en attendant la génération des hooks
   const loading = false;
@@ -20,7 +19,6 @@ const ArticlePage = () => {
   // Gestion des commentaires et likes
   const [addingComment, setAddingComment] = useState(false);
   const [likingArticle, setLikingArticle] = useState(false);
-  const [deletingComment, setDeletingComment] = useState(false);
   
   // Données simulées pour le développement
   const article = {
@@ -104,23 +102,9 @@ const ArticlePage = () => {
       console.log(`Ajouter commentaire à l'article ${articleId}: ${content}`);
       // Ici nous appellerions la mutation addComment
       setAddingComment(false);
-      setCommentContent('');
     } catch (error) {
       console.error('Erreur lors de l\'ajout du commentaire :', error);
       setAddingComment(false);
-    }
-  };
-  
-  const handleDeleteComment = async (commentId: string) => {
-    try {
-      setDeletingComment(true);
-      // Simulation de la suppression du commentaire
-      console.log(`Supprimer commentaire ${commentId}`);
-      // Ici nous appellerions la mutation deleteComment
-      setDeletingComment(false);
-    } catch (error) {
-      console.error('Erreur lors de la suppression du commentaire :', error);
-      setDeletingComment(false);
     }
   };
   
@@ -284,7 +268,6 @@ const ArticlePage = () => {
                 content={comment.content}
                 createdAt={comment.createdAt}
                 author={comment.author}
-                onDelete={handleDeleteComment}
               />
             ))
           )}
