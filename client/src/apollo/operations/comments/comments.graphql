@@ -1,0 +1,33 @@
+query GetComments($articleId: ID!) {
+  comments(articleId: $articleId) {
+    id
+    content
+    createdAt
+    author {
+      id
+      username
+      avatar
+    }
+    article {
+      id
+      title
+    }
+  }
+}
+
+mutation AddComment($input: CommentInput!) {
+  addComment(input: $input) {
+    id
+    content
+    createdAt
+    author {
+      id
+      username
+      avatar
+    }
+  }
+}
+
+mutation DeleteComment($id: ID!) {
+  deleteComment(id: $id)
+} 

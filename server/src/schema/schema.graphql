@@ -1,0 +1,95 @@
+scalar DateTime
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  createdAt: DateTime!
+  avatar: String
+  articles: [Article!]!
+  comments: [Comment!]!
+  likes: [Like!]!
+}
+
+type Article {
+  id: ID!
+  title: String!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  author: User!
+  comments: [Comment!]!
+  likes: [Like!]!
+  likesCount: Int!
+}
+
+type Comment {
+  id: ID!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  author: User!
+  article: Article!
+}
+
+type Like {
+  id: ID!
+  createdAt: DateTime!
+  user: User!
+  article: Article!
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+input RegisterInput {
+  username: String!
+  email: String!
+  password: String!
+  avatar: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input ArticleInput {
+  title: String!
+  content: String!
+}
+
+input ArticleUpdateInput {
+  title: String
+  content: String
+}
+
+input CommentInput {
+  content: String!
+  articleId: ID!
+}
+
+type Query {
+  me: User
+  user(id: ID!): User
+  users: [User!]!
+  article(id: ID!): Article
+  articles(offset: Int, limit: Int, authorId: ID): [Article!]!
+  comments(articleId: ID!): [Comment!]!
+}
+
+type Mutation {
+  register(input: RegisterInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload!
+  
+  createArticle(input: ArticleInput!): Article!
+  updateArticle(id: ID!, input: ArticleUpdateInput!): Article!
+  deleteArticle(id: ID!): Boolean!
+  
+  addComment(input: CommentInput!): Comment!
+  deleteComment(id: ID!): Boolean!
+  
+  toggleLike(articleId: ID!): Article!
+} 
