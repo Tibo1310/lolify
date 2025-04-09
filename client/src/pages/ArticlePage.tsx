@@ -6,7 +6,12 @@ import CommentItem from '../components/CommentItem';
 import CommentForm from '../components/CommentForm';
 import { useAuth } from '../context/AuthContext';
 import { GET_ARTICLE } from '../graphql/queries';
-import { TOGGLE_LIKE_MUTATION, ADD_COMMENT_MUTATION, DELETE_ARTICLE } from '../graphql/mutations';
+import { 
+  TOGGLE_LIKE_MUTATION, 
+  ADD_COMMENT_MUTATION, 
+  DELETE_ARTICLE,
+  DELETE_COMMENT_MUTATION 
+} from '../graphql/mutations';
 
 interface Like {
   id: string;
@@ -93,6 +98,13 @@ const ArticlePage = () => {
       navigate('/');
     }
   });
+
+  const [deleteComment] = useMutation(DELETE_COMMENT_MUTATION, {
+    refetchQueries: [{
+      query: GET_ARTICLE,
+      variables: { id }
+    }]
+  });
   
   // State for loading states
   const [addingComment, setAddingComment] = useState(false);
@@ -152,6 +164,16 @@ const ArticlePage = () => {
       } catch (error) {
         console.error('Erreur lors de la suppression :', error);
       }
+    }
+  };
+  
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment({
+        variables: { id: commentId }
+      });
+    } catch (error) {
+      console.error('Erreur lors de la suppression du commentaire:', error);
     }
   };
   
@@ -281,37 +303,34 @@ const ArticlePage = () => {
         <div className="p-6">
           <h2 className="text-xl font-bold mb-6">Commentaires</h2>
           
-          {isAuthenticated ? (
-            <CommentForm 
-              articleId={article.id}
-              onSubmit={handleAddComment}
-              loading={addingComment}
-            />
-          ) : (
-            <div className="text-center py-4 bg-league-dark/40 border border-league-gold/10 rounded mb-6">
-              <Link to="/login" className="text-league-teal hover:text-league-gold">
-                Connectez-vous pour commenter
-              </Link>
-            </div>
-          )}
-          
-          {article.comments.length > 0 ? (
-            <div className="space-y-6">
+          <div className="space-y-6 mt-8">
+            <h2 className="text-xl font-bold mb-4">Commentaires ({article.comments.length})</h2>
+            
+            {isAuthenticated ? (
+              <CommentForm 
+                articleId={article.id} 
+                onSubmit={handleAddComment}
+                loading={addingComment}
+              />
+            ) : (
+              <p className="text-gray-400 mb-4">
+                <Link to="/login" className="text-league-teal hover:text-league-gold">Connectez-vous</Link> pour laisser un commentaire
+              </p>
+            )}
+            
+            <div className="space-y-4">
               {article.comments.map((comment) => (
-                <CommentItem 
+                <CommentItem
                   key={comment.id}
                   id={comment.id}
                   content={comment.content}
                   createdAt={comment.createdAt}
                   author={comment.author}
+                  onDelete={handleDeleteComment}
                 />
               ))}
             </div>
-          ) : (
-            <div className="text-center py-4 bg-league-dark/40 border border-league-gold/10 rounded">
-              <p className="text-gray-400">Aucun commentaire pour le moment</p>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
