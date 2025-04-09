@@ -1,6 +1,7 @@
 import { userResolvers } from './user';
 import { articleResolvers } from './article';
 import { commentResolvers } from './comment';
+import { likeResolvers } from './like';
 import { GraphQLScalarType, Kind } from 'graphql';
 
 // Résolveur pour le type scalar DateTime
@@ -43,4 +44,5 @@ export const resolvers = {
   User: userResolvers.User,
   Article: articleResolvers.Article,
   Comment: commentResolvers.Comment,
+  Like: likeResolvers.Like,
 }; 

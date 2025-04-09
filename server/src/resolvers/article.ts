@@ -170,6 +170,15 @@ export const articleResolvers = {
       // Vérifier si l'article existe
       const article = await prisma.article.findUnique({
         where: { id: articleId },
+        include: {
+          author: true,
+          likes: {
+            include: {
+              user: true
+            }
+          },
+          comments: true
+        }
       });
 
       if (!article) {
@@ -207,16 +216,28 @@ export const articleResolvers = {
               connect: { id: articleId },
             },
           },
+          include: {
+            user: true,
+            article: true
+          }
         });
       }
 
-      // Retourner l'article mis à jour
+      // Retourner l'article mis à jour avec toutes les relations
       return prisma.article.findUnique({
         where: { id: articleId },
         include: {
           author: true,
-          likes: true,
-          comments: true
+          likes: {
+            include: {
+              user: true
+            }
+          },
+          comments: {
+            include: {
+              author: true
+            }
+          }
         }
       });
     },
