@@ -10,8 +10,24 @@ export const userResolvers = {
       }
       return currentUser;
     },
-    user: async (_: unknown, { id }: { id: string }, { prisma }: Context) => {
-      const user = await prisma.user.findUnique({ where: { id } });
+    user: async (
+      _: unknown,
+      { id, username }: { id?: string; username?: string },
+      { prisma }: Context
+    ) => {
+      if (!id && !username) {
+        throw new Error('Vous devez fournir soit un ID soit un nom d\'utilisateur');
+      }
+
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: id || undefined },
+            { username: username || undefined }
+          ]
+        }
+      });
+
       if (!user) {
         throw new Error('Utilisateur non trouvé');
       }
@@ -96,17 +112,26 @@ export const userResolvers = {
   },
 
   User: {
-    articles: (parent: UserModel, _: unknown, { prisma }: Context) => {
+    articles: (parent: UserModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Utilisateur non trouvé');
+      }
       return prisma.article.findMany({
         where: { authorId: parent.id },
       });
     },
-    comments: (parent: UserModel, _: unknown, { prisma }: Context) => {
+    comments: (parent: UserModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Utilisateur non trouvé');
+      }
       return prisma.comment.findMany({
         where: { authorId: parent.id },
       });
     },
-    likes: (parent: UserModel, _: unknown, { prisma }: Context) => {
+    likes: (parent: UserModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Utilisateur non trouvé');
+      }
       return prisma.like.findMany({
         where: { userId: parent.id },
       });

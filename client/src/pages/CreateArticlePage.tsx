@@ -1,7 +1,29 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-// Nous importerons ces hooks une fois générés
-// import { useCreateArticleMutation } from '../apollo/generated';
+import { useMutation } from '@apollo/client';
+import { CREATE_ARTICLE_MUTATION } from '../graphql/mutations';
+import { GET_ARTICLES } from '../graphql/queries';
+
+interface CreateArticleData {
+  createArticle: {
+    id: string;
+    title: string;
+    content: string;
+    createdAt: string;
+    author: {
+      id: string;
+      username: string;
+      avatar: string | null;
+    };
+  };
+}
+
+interface CreateArticleVars {
+  input: {
+    title: string;
+    content: string;
+  };
+}
 
 const CreateArticlePage = () => {
   const [title, setTitle] = useState('');
@@ -9,28 +31,36 @@ const CreateArticlePage = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  // Simuler la mutation en attendant la génération des hooks
-  const [createArticle, { loading }] = [
-    async ({ variables }: any) => {
-      // Simuler une création d'article réussie
-      if (title && content) {
-        // Simulation d'une création réussie
-        return {
-          data: {
-            createArticle: {
-              id: 'new-article-id',
-              title: variables.input.title,
-              content: variables.input.content,
-              createdAt: new Date().toISOString()
-            }
+  const [createArticle, { loading }] = useMutation<CreateArticleData, CreateArticleVars>(
+    CREATE_ARTICLE_MUTATION,
+    {
+      update(cache, { data }) {
+        if (!data) return;
+        
+        // Mettre à jour le cache Apollo pour inclure le nouvel article
+        const newArticle = data.createArticle;
+        
+        try {
+          const existingArticles = cache.readQuery<{ articles: any[] }>({
+            query: GET_ARTICLES,
+            variables: { offset: 0, limit: 10 },
+          });
+
+          if (existingArticles) {
+            cache.writeQuery({
+              query: GET_ARTICLES,
+              variables: { offset: 0, limit: 10 },
+              data: {
+                articles: [newArticle, ...existingArticles.articles],
+              },
+            });
           }
-        };
-      } else {
-        throw new Error('Le titre et le contenu sont obligatoires');
-      }
-    },
-    { loading: false }
-  ];
+        } catch (e) {
+          console.error('Erreur lors de la mise à jour du cache:', e);
+        }
+      },
+    }
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +82,8 @@ const CreateArticlePage = () => {
       const result = await createArticle({
         variables: {
           input: {
-            title,
-            content
+            title: title.trim(),
+            content: content.trim()
           }
         }
       });
@@ -92,7 +122,7 @@ const CreateArticlePage = () => {
         </Link>
       </div>
       
-      <h1 className="text-center mb-8">Créer un nouvel article</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">Créer un nouvel article</h1>
       
       <div className="bg-league-dark border border-league-gold/30 rounded-lg overflow-hidden shadow-lg p-6 mb-8">
         {error && (
@@ -111,7 +141,7 @@ const CreateArticlePage = () => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full"
+              className="w-full bg-league-dark/50 border border-league-gold/30 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-league-gold"
               placeholder="Un titre accrocheur"
               required
             />
@@ -125,7 +155,7 @@ const CreateArticlePage = () => {
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full h-64"
+              className="w-full h-64 bg-league-dark/50 border border-league-gold/30 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-league-gold"
               placeholder="Rédigez votre article ici..."
               required
             ></textarea>
@@ -134,7 +164,7 @@ const CreateArticlePage = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-league-gold text-league-dark px-4 py-2 rounded font-semibold hover:bg-league-teal transition-colors"
+              className="bg-league-gold text-league-dark px-6 py-3 rounded-lg font-semibold hover:bg-league-teal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? 'Publication en cours...' : 'Publier l\'article'}
@@ -158,4 +188,4 @@ const CreateArticlePage = () => {
   );
 };
 
-export default CreateArticlePage; 
+export default CreateArticlePage;

@@ -1,5 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -12,6 +12,15 @@ import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+
+// Composant pour rediriger vers le profil de l'utilisateur connecté
+const ProfileRedirect = () => {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+  return <Navigate to={`/profile/${user.username}`} />;
+};
 
 function App() {
   return (
@@ -39,6 +48,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          <Route path="profile" element={<ProfileRedirect />} />
           <Route path="profile/:username" element={<ProfilePage />} />
           <Route 
             path="settings" 

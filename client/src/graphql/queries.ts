@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_ARTICLES = gql`
-  query GetArticles($offset: Int, $limit: Int) {
-    articles(offset: $offset, limit: $limit) {
+  query GetArticles($offset: Int, $limit: Int, $search: String) {
+    articles(offset: $offset, limit: $limit, search: $search) {
       id
       title
       content
@@ -83,6 +83,18 @@ export const GET_USER = gql`
 export const GET_ME = gql`
   query GetMe {
     me {
+      id
+      username
+      email
+      createdAt
+      avatar
+    }
+  }
+`;
+
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($username: String!) {
+    user(username: $username) {
       id
       username
       email

@@ -96,4 +96,21 @@ export const TOGGLE_LIKE_MUTATION = gql`
       }
     }
   }
+`;
+
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile($input: UpdateProfileInput!) {
+    updateProfile(input: $input) {
+      id
+      username
+      email
+      avatar
+    }
+  }
+`;
+
+export const DELETE_ACCOUNT = gql`
+  mutation DeleteAccount($password: String!) {
+    deleteAccount(password: $password)
+  }
 `; 
