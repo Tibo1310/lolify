@@ -39,7 +39,7 @@ async function startServer() {
   app.use(
     '/graphql',
     cors<cors.CorsRequest>({
-      origin: '*', // En production, limitez aux domaines autorisés
+      origin: ['http://localhost:4173', 'http://localhost:5173'], // URLs du frontend en dev
       credentials: true,
     }),
     express.json(),
