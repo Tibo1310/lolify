@@ -69,22 +69,20 @@ const ArticlesPage = () => {
         ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     } else {
-      return b.likesCount - a.likesCount;
+      // Pour le filtre "popular", trier par nombre de likes
+      return sortDirection === 'desc'
+        ? b.likesCount - a.likesCount
+        : a.likesCount - b.likesCount;
     }
   });
 
-  // Limiter à 5 articles pour le filtre "Plus populaires"
-  const displayedArticles = activeFilter === 'popular'
-    ? sortedArticles.slice(0, 5)
-    : sortedArticles;
-  
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
   
   const handleFilterChange = (filter: string) => {
-    if (filter === 'latest' && activeFilter === 'latest') {
-      // Si on clique sur le filtre actif "latest", on inverse juste le tri
+    if (filter === activeFilter) {
+      // Si on clique sur le filtre actif, on inverse juste le tri
       setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
     } else {
       setActiveFilter(filter);
@@ -108,6 +106,9 @@ const ArticlesPage = () => {
       </div>
     );
   }
+
+  // Pas de limite sur le nombre d'articles affichés
+  const displayedArticles = sortedArticles;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -190,7 +191,10 @@ const ArticlesPage = () => {
                   : 'bg-league-dark/70 text-white hover:bg-league-dark'
               }`}
             >
-              Plus populaires
+              {activeFilter === 'popular' 
+                ? (sortDirection === 'desc' ? 'Plus populaires' : 'Moins populaires')
+                : 'Plus populaires'
+              }
             </button>
           </div>
         </div>
