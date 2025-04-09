@@ -1,135 +1,54 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
 import { useAuth } from '../context/AuthContext';
 import ArticleCard from '../components/ArticleCard';
+import { GET_ARTICLES } from '../graphql/queries';
+
+interface Author {
+  id: string;
+  username: string;
+  avatar: string | null;
+}
+
+interface Article {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  author: Author;
+  likesCount: number;
+}
+
+interface ArticlesData {
+  articles: Article[];
+}
 
 const ArticlesPage = () => {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('latest');
   
-  // Articles simulés pour le développement
-  const articles = [
-    {
-      id: 'article-1',
-      title: 'Comment devenir meilleur à League of Legends',
-      content: 'Les conseils essentiels pour progresser rapidement et efficacement dans League of Legends, de la lane phase à la gestion du late game.',
-      createdAt: new Date(2023, 10, 15).toISOString(),
-      author: {
-        id: 'user-1',
-        username: 'ProGamer123',
-        avatar: null
-      },
-      likesCount: 42
-    },
-    {
-      id: 'article-2',
-      title: 'Guide complet : jouer Lee Sin en jungle',
-      content: 'Tout ce que vous devez savoir pour maîtriser Lee Sin en jungle : runes, build, ganks, combos et late game.',
-      createdAt: new Date(2023, 9, 22).toISOString(),
-      author: {
-        id: 'user-2',
-        username: 'JungleKing',
-        avatar: null
-      },
-      likesCount: 37
-    },
-    {
-      id: 'article-3',
-      title: 'Analyse du meta actuel (Patch 13.24)',
-      content: 'Un aperçu des champions et stratégies dominants dans le patch actuel, avec conseils pour s\'adapter aux changements.',
-      createdAt: new Date(2023, 11, 5).toISOString(),
-      author: {
-        id: 'user-3',
-        username: 'LolAnalyst',
-        avatar: null
-      },
-      likesCount: 29
-    },
-    {
-      id: 'article-4',
-      title: 'Top 5 des champions pour chaque rôle en SoloQ',
-      content: 'Découvrez les champions les plus performants pour chaque rôle dans le patch actuel. Idéal pour grimper en SoloQ.',
-      createdAt: new Date(2023, 11, 10).toISOString(),
-      author: {
-        id: 'user-4',
-        username: 'RankClimber',
-        avatar: null
-      },
-      likesCount: 54
-    },
-    {
-      id: 'article-5',
-      title: 'Comment améliorer sa vision dans League of Legends',
-      content: 'La vision est l\'un des aspects les plus négligés mais les plus importants du jeu. Apprenez comment l\'optimiser dans vos parties.',
-      createdAt: new Date(2023, 11, 8).toISOString(),
-      author: {
-        id: 'user-5',
-        username: 'SupportMain',
-        avatar: null
-      },
-      likesCount: 32
-    },
-    {
-      id: 'article-6',
-      title: 'L\'importance du CS dans League of Legends',
-      content: 'Le farm est souvent négligé en bas ELO, mais c\'est l\'une des compétences les plus importantes pour progresser. Voici comment l\'améliorer.',
-      createdAt: new Date(2023, 10, 2).toISOString(),
-      author: {
-        id: 'user-2',
-        username: 'JungleKing',
-        avatar: null
-      },
-      likesCount: 27
-    },
-    {
-      id: 'article-7',
-      title: 'Comment jouer en équipe en SoloQ',
-      content: 'La SoloQ peut être frustrante, mais voici comment mieux jouer en équipe même avec des inconnus pour augmenter vos chances de victoire.',
-      createdAt: new Date(2023, 11, 1).toISOString(),
-      author: {
-        id: 'user-1',
-        username: 'ProGamer123',
-        avatar: null
-      },
-      likesCount: 36
-    },
-    {
-      id: 'article-8',
-      title: 'Les meilleurs supports pour la saison 14',
-      content: 'Avec la nouvelle saison qui arrive, découvrez quels supports seront les plus performants sur la Faille de l\'invocateur.',
-      createdAt: new Date(2023, 10, 25).toISOString(),
-      author: {
-        id: 'user-5',
-        username: 'SupportMain',
-        avatar: null
-      },
-      likesCount: 22
-    }
-  ];
-  
+  // Effet pour le debounce de la recherche
   useEffect(() => {
-    // Ici, nous simulons le chargement des articles
-    setIsLoading(true);
-    
-    // Simuler une requête API
-    setTimeout(() => {
-      setIsLoading(false);
-      // En cas d'erreur, nous pourrions faire : setError('Message d'erreur');
-    }, 500);
-  }, [activeFilter]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500); // Délai de 300ms
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
   
-  // Filtrer les articles en fonction de la recherche
-  const filteredArticles = articles.filter(article => 
-    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    article.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    article.author.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const { loading: isLoading, error, data } = useQuery<ArticlesData>(GET_ARTICLES, {
+    variables: { 
+      offset: 0, 
+      limit: 50,
+      search: debouncedSearch || undefined
+    },
+  });
   
   // Trier les articles en fonction du filtre actif
-  const sortedArticles = [...filteredArticles].sort((a, b) => {
+  const sortedArticles = data?.articles ? [...data.articles].sort((a, b) => {
     if (activeFilter === 'latest') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     } else if (activeFilter === 'popular') {
@@ -137,7 +56,7 @@ const ArticlesPage = () => {
     } else {
       return 0; // Pas de tri
     }
-  });
+  }) : [];
   
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -158,7 +77,7 @@ const ArticlesPage = () => {
   if (error) {
     return (
       <div className="bg-red-900/20 border border-red-500 text-red-300 p-4 rounded-lg">
-        {error}
+        {error.message}
       </div>
     );
   }
@@ -189,7 +108,7 @@ const ArticlesPage = () => {
               placeholder="Rechercher un article..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-league-dark/70 border border-league-gold/30 focus:border-league-gold focus:outline-none"
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-league-dark/70 border border-league-gold/30 focus:border-league-gold focus:outline-none text-white"
             />
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -204,20 +123,20 @@ const ArticlesPage = () => {
           <div className="flex gap-2">
             <button
               onClick={() => handleFilterChange('latest')}
-              className={`px-3 py-2 rounded-lg ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeFilter === 'latest'
-                  ? 'bg-league-gold text-league-dark font-medium'
-                  : 'bg-league-dark/70 border border-league-gold/30 hover:bg-league-dark'
+                  ? 'bg-league-gold text-league-dark'
+                  : 'bg-league-dark/70 text-white hover:bg-league-dark'
               }`}
             >
               Plus récents
             </button>
             <button
               onClick={() => handleFilterChange('popular')}
-              className={`px-3 py-2 rounded-lg ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeFilter === 'popular'
-                  ? 'bg-league-gold text-league-dark font-medium'
-                  : 'bg-league-dark/70 border border-league-gold/30 hover:bg-league-dark'
+                  ? 'bg-league-gold text-league-dark'
+                  : 'bg-league-dark/70 text-white hover:bg-league-dark'
               }`}
             >
               Plus populaires
@@ -241,19 +160,19 @@ const ArticlesPage = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-league-dark/40 border border-league-gold/10 rounded">
-          {searchQuery ? (
-            <div>
-              <p className="text-gray-400 mb-2">Aucun article trouvé pour "{searchQuery}"</p>
-              <button
-                onClick={() => setSearchQuery('')}
-                className="text-league-teal hover:text-league-gold"
-              >
-                Effacer la recherche
-              </button>
-            </div>
-          ) : (
-            <p className="text-gray-400">Aucun article disponible</p>
+        <div className="text-center py-12">
+          <p className="text-gray-400 mb-4">
+            {searchQuery
+              ? 'Aucun article ne correspond à votre recherche'
+              : 'Aucun article pour le moment'}
+          </p>
+          {user && !searchQuery && (
+            <Link 
+              to="/articles/create" 
+              className="inline-block bg-league-gold text-league-dark px-4 py-2 rounded font-medium hover:bg-league-teal transition-colors"
+            >
+              Publier le premier article
+            </Link>
           )}
         </div>
       )}

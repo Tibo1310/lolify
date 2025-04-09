@@ -76,7 +76,7 @@ type Query {
   user(id: ID!): User
   users: [User!]!
   article(id: ID!): Article
-  articles(offset: Int, limit: Int, authorId: ID): [Article!]!
+  articles(offset: Int, limit: Int, authorId: ID, search: String): [Article!]!
   comments(articleId: ID!): [Comment!]!
 }
 

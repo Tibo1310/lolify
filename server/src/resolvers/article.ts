@@ -1,5 +1,6 @@
 import { Context } from '../context/context';
 import { ArticleModel } from '../types/models';
+import { Prisma } from '@prisma/client';
 
 export const articleResolvers = {
   Query: {
@@ -12,17 +13,51 @@ export const articleResolvers = {
     },
     articles: async (
       _: unknown,
-      { offset = 0, limit = 10, authorId }: { offset?: number; limit?: number; authorId?: string },
+      { offset = 0, limit = 10, authorId, search }: { offset?: number; limit?: number; authorId?: string; search?: string },
       { prisma }: Context
     ) => {
-      const where = authorId ? { authorId } : {};
+      // Construire la condition where
+      let where: Prisma.ArticleWhereInput = {};
       
-      return prisma.article.findMany({
+      // Ajouter le filtre par auteur si spécifié
+      if (authorId) {
+        where.authorId = authorId;
+      }
+      
+      // Ajouter la recherche si spécifiée
+      if (search) {
+        const searchTerm = search.toLowerCase();
+        where.OR = [
+          { title: { contains: searchTerm } },
+          { content: { contains: searchTerm } }
+        ];
+      }
+      
+      // Si une recherche est effectuée, on doit d'abord récupérer tous les articles
+      // puis filtrer ceux dont l'auteur correspond à la recherche
+      const articles = await prisma.article.findMany({
         where,
         skip: offset,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        include: {
+          author: true,
+          likes: true,
+          comments: true
+        }
       });
+
+      // Si une recherche est effectuée, filtrer également par nom d'auteur
+      if (search) {
+        const searchTerm = search.toLowerCase();
+        return articles.filter(article => 
+          article.title.toLowerCase().includes(searchTerm) ||
+          article.content.toLowerCase().includes(searchTerm) ||
+          article.author.username.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      return articles;
     },
   },
 
@@ -44,6 +79,11 @@ export const articleResolvers = {
             connect: { id: currentUser.id },
           },
         },
+        include: {
+          author: true,
+          likes: true,
+          comments: true
+        }
       });
     },
 
@@ -75,6 +115,11 @@ export const articleResolvers = {
           title: input.title || undefined,
           content: input.content || undefined,
         },
+        include: {
+          author: true,
+          likes: true,
+          comments: true
+        }
       });
     },
 
@@ -162,28 +207,45 @@ export const articleResolvers = {
       // Retourner l'article mis à jour
       return prisma.article.findUnique({
         where: { id: articleId },
+        include: {
+          author: true,
+          likes: true,
+          comments: true
+        }
       });
     },
   },
 
   Article: {
-    author: (parent: ArticleModel, _: unknown, { prisma }: Context) => {
+    author: async (parent: ArticleModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Article non trouvé');
+      }
       return prisma.user.findUnique({
         where: { id: parent.authorId },
       });
     },
-    comments: (parent: ArticleModel, _: unknown, { prisma }: Context) => {
+    comments: async (parent: ArticleModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Article non trouvé');
+      }
       return prisma.comment.findMany({
         where: { articleId: parent.id },
         orderBy: { createdAt: 'desc' },
       });
     },
-    likes: (parent: ArticleModel, _: unknown, { prisma }: Context) => {
+    likes: async (parent: ArticleModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Article non trouvé');
+      }
       return prisma.like.findMany({
         where: { articleId: parent.id },
       });
     },
-    likesCount: async (parent: ArticleModel, _: unknown, { prisma }: Context) => {
+    likesCount: async (parent: ArticleModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Article non trouvé');
+      }
       const count = await prisma.like.count({
         where: { articleId: parent.id },
       });

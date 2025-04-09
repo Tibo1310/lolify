@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_ARTICLES = gql`
-  query GetArticles($offset: Int, $limit: Int) {
-    articles(offset: $offset, limit: $limit) {
+  query GetArticles($offset: Int, $limit: Int, $search: String) {
+    articles(offset: $offset, limit: $limit, search: $search) {
       id
       title
       content
