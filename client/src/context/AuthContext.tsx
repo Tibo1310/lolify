@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 // Nous importerons useMeLazyQuery une fois qu'il sera généré
 // import { useMeLazyQuery } from '../apollo/generated';
 
@@ -6,13 +6,14 @@ interface User {
   id: string;
   username: string;
   email: string;
-  avatar?: string | null;
+  avatar: string | null;
   bio?: string | null;
 }
 
 interface AuthContextType {
-  isAuthenticated: boolean;
   user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
   loading: boolean;
@@ -20,13 +21,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   // Nous utiliserons cette query une fois générée
   // const [getMe] = useMeLazyQuery();
 
   useEffect(() => {
+    // Vérifier le token stocké au chargement
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
+    }
+
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
       
@@ -54,21 +67,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // }, [getMe]);
   }, []);
 
-  const login = (token: string, userData: User) => {
-    localStorage.setItem('token', token);
+  const login = (newToken: string, userData: User) => {
+    setToken(newToken);
     setUser(userData);
+    setIsAuthenticated(true);
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    setToken(null);
     setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
 
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: !!user,
         user,
+        token,
+        isAuthenticated,
         login,
         logout,
         loading,
@@ -82,7 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth doit être utilisé à l\'intérieur d\'un AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }; 

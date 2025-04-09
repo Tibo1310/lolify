@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useMutation } from '@apollo/client';
+import { LOGIN_MUTATION } from '../graphql/mutations';
 // Nous importerons ces hooks une fois générés
 // import { useLoginMutation } from '../apollo/generated';
 
@@ -8,11 +10,17 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  const [loginMutation, { loading: isLoading }] = useMutation(LOGIN_MUTATION, {
+    onError: (error) => {
+      // Gérer les erreurs de l'API GraphQL
+      setError(error.message || 'Une erreur est survenue lors de la connexion');
+    }
+  });
   
   // Rediriger si déjà connecté
   useEffect(() => {
@@ -39,30 +47,26 @@ const LoginPage = () => {
       return;
     }
     
-    setIsLoading(true);
-    
     try {
-      // Simuler une connexion réussie
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data } = await loginMutation({
+        variables: {
+          input: {
+            email,
+            password
+          }
+        }
+      });
       
-      // Simuler un utilisateur connecté
-      const userData = {
-        id: 'user-1',
-        username: 'ProGamer123',
-        email,
-        avatar: null
-      };
-      
-      const token = 'fake-jwt-token';
-      
-      login(token, userData);
-      
-      // Rediriger vers la page d'accueil
-      navigate('/');
+      if (data?.login) {
+        const { token, user: userData } = data.login;
+        login(token, userData);
+        navigate('/');
+      } else {
+        setError('Email ou mot de passe incorrect');
+      }
     } catch (err) {
-      setError('Email ou mot de passe incorrect');
-    } finally {
-      setIsLoading(false);
+      // L'erreur est déjà gérée par onError dans useMutation
+      console.error('Erreur de connexion:', err);
     }
   };
 
@@ -123,7 +127,7 @@ const LoginPage = () => {
           
           <button
             type="submit"
-            className="w-full bg-league-gold text-league-dark py-2 px-4 rounded font-semibold hover:bg-league-teal transition-colors mb-4"
+            className="w-full bg-league-gold text-league-dark py-2 px-4 rounded font-semibold hover:bg-league-teal transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             {isLoading ? 'Connexion en cours...' : 'Se connecter'}

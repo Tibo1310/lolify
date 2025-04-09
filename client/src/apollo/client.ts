@@ -3,7 +3,8 @@ import { setContext } from '@apollo/client/link/context';
 
 // Créer le lien HTTP
 const httpLink = createHttpLink({
-  uri: '/graphql',
+  uri: 'http://localhost:4000/graphql',
+  credentials: 'include'
 });
 
 // Ajouter le token d'authentification aux en-têtes
@@ -26,7 +27,12 @@ export const client = new ApolloClient({
   cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'network-only',
+    },
+    query: {
+      fetchPolicy: 'network-only',
     },
   },
+  connectToDevTools: true, // Activer les DevTools Apollo
+  credentials: 'include'
 }); 

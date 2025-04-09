@@ -28,6 +28,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  csrfPrevention: false, // Désactiver la prévention CSRF en développement
 });
 
 // Démarrer le serveur
@@ -35,13 +36,18 @@ async function startServer() {
   // Démarrer Apollo Server
   await server.start();
 
-  // Configurer les middleware
+  const corsOptions = {
+    origin: ['http://localhost:4173', 'http://localhost:5173', 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
+
+  // Appliquer CORS à toutes les routes
+  app.use(cors(corsOptions));
+
   app.use(
     '/graphql',
-    cors<cors.CorsRequest>({
-      origin: ['http://localhost:4173', 'http://localhost:5173'], // URLs du frontend en dev
-      credentials: true,
-    }),
     express.json(),
     expressMiddleware(server, {
       context: createContext,
