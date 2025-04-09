@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-// Nous importerons ces hooks une fois générés
-// import { useRegisterMutation } from '../apollo/generated';
+import { useMutation } from '@apollo/client';
+import { REGISTER_MUTATION } from '../graphql/mutations';
 
 const RegisterPage = () => {
   const [username, setUsername] = useState('');
@@ -13,41 +13,36 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   
-  // Simuler la mutation en attendant la génération des hooks
-  const [registerMutation, { loading }] = [
-    async ({ variables }: any) => {
-      // Vérifier que les mots de passe correspondent
-      if (password !== confirmPassword) {
-        throw new Error('Les mots de passe ne correspondent pas');
-      }
-      
-      // Simuler une inscription réussie
-      if (username && email && password) {
-        // Simulation d'une inscription réussie
-        return {
-          data: {
-            register: {
-              token: 'fake-jwt-token',
-              user: {
-                id: '1',
-                username: variables.input.username,
-                email: variables.input.email,
-                createdAt: new Date().toISOString(),
-                avatar: null
-              }
-            }
-          }
-        };
-      } else {
-        throw new Error('Tous les champs sont obligatoires');
-      }
-    },
-    { loading: false }
-  ];
+  const [registerMutation, { loading }] = useMutation(REGISTER_MUTATION, {
+    onError: (error) => {
+      setError(error.message || 'Une erreur est survenue lors de l\'inscription');
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    // Validation des champs
+    if (!username.trim()) {
+      setError('Le nom d\'utilisateur est requis');
+      return;
+    }
+
+    if (!email.trim()) {
+      setError('L\'email est requis');
+      return;
+    }
+
+    if (!password) {
+      setError('Le mot de passe est requis');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
     
     // Vérifier que les mots de passe correspondent
     if (password !== confirmPassword) {
@@ -56,8 +51,7 @@ const RegisterPage = () => {
     }
     
     try {
-      // Appeler la mutation d'inscription
-      const result = await registerMutation({
+      const { data } = await registerMutation({
         variables: {
           input: {
             username,
@@ -67,19 +61,23 @@ const RegisterPage = () => {
         }
       });
 
-      // Stocker le token et les informations utilisateur
-      if (result?.data?.register) {
-        login(result.data.register.token, result.data.register.user);
+      if (data?.register) {
+        // Connecter l'utilisateur automatiquement après l'inscription
+        const { token, user: userData } = data.register;
+        login(token, userData);
         navigate('/');
+      } else {
+        setError('Une erreur est survenue lors de l\'inscription');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      // L'erreur est déjà gérée par onError dans useMutation
+      console.error('Erreur d\'inscription:', err);
     }
   };
 
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-center mb-8">Créer un compte</h1>
+      <h1 className="text-2xl font-bold text-center mb-8">Créer un compte</h1>
       
       <div className="bg-league-dark border border-league-gold/30 rounded-lg p-8 shadow-lg">
         {error && (
@@ -101,6 +99,7 @@ const RegisterPage = () => {
               className="w-full"
               placeholder="Votre nom d'utilisateur"
               required
+              disabled={loading}
             />
           </div>
           
@@ -116,6 +115,7 @@ const RegisterPage = () => {
               className="w-full"
               placeholder="votre@email.com"
               required
+              disabled={loading}
             />
           </div>
           
@@ -131,6 +131,7 @@ const RegisterPage = () => {
               className="w-full"
               placeholder="••••••••"
               required
+              disabled={loading}
             />
           </div>
           
@@ -146,19 +147,20 @@ const RegisterPage = () => {
               className="w-full"
               placeholder="••••••••"
               required
+              disabled={loading}
             />
           </div>
           
           <button
             type="submit"
-            className="w-full mb-4"
+            className="w-full bg-league-gold text-league-dark py-2 px-4 rounded font-semibold hover:bg-league-teal transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
           >
             {loading ? 'Inscription en cours...' : 'S\'inscrire'}
           </button>
           
           <p className="text-center text-gray-400">
-            Déjà un compte? {' '}
+            Déjà un compte ?{' '}
             <Link to="/login" className="text-league-teal hover:text-league-gold">
               Se connecter
             </Link>

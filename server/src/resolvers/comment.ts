@@ -78,15 +78,35 @@ export const commentResolvers = {
   },
 
   Comment: {
-    author: (parent: CommentModel, _: unknown, { prisma }: Context) => {
-      return prisma.user.findUnique({
+    author: async (parent: CommentModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Commentaire non trouvé');
+      }
+
+      const author = await prisma.user.findUnique({
         where: { id: parent.authorId },
       });
+      
+      if (!author) {
+        throw new Error('Auteur non trouvé');
+      }
+      
+      return author;
     },
-    article: (parent: CommentModel, _: unknown, { prisma }: Context) => {
-      return prisma.article.findUnique({
+    article: async (parent: CommentModel | null, _: unknown, { prisma }: Context) => {
+      if (!parent) {
+        throw new Error('Commentaire non trouvé');
+      }
+
+      const article = await prisma.article.findUnique({
         where: { id: parent.articleId },
       });
+      
+      if (!article) {
+        throw new Error('Article non trouvé');
+      }
+      
+      return article;
     },
   },
 }; 
