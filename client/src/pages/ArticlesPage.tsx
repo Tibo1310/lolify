@@ -29,12 +29,13 @@ const ArticlesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('latest');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   
   // Effet pour le debounce de la recherche
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-    }, 500); // Délai de 300ms
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -49,21 +50,32 @@ const ArticlesPage = () => {
   
   // Trier les articles en fonction du filtre actif
   const sortedArticles = data?.articles ? [...data.articles].sort((a, b) => {
+    const multiplier = sortDirection === 'desc' ? 1 : -1;
+    
     if (activeFilter === 'latest') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      return multiplier * (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } else if (activeFilter === 'popular') {
-      return b.likesCount - a.likesCount;
-    } else {
-      return 0; // Pas de tri
+      return multiplier * (b.likesCount - a.likesCount);
     }
+    return 0;
   }) : [];
+
+  // Si le filtre est "popular", ne garder que les 5 premiers articles
+  const displayedArticles = activeFilter === 'popular' ? sortedArticles.slice(0, 5) : sortedArticles;
   
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
   
   const handleFilterChange = (filter: string) => {
-    setActiveFilter(filter);
+    if (filter === 'latest' && activeFilter === 'latest') {
+      // Si on clique sur le filtre actif "latest", on inverse juste le tri
+      setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
+    } else {
+      setActiveFilter(filter);
+      // Réinitialiser le tri en ordre décroissant pour les nouveaux filtres
+      setSortDirection('desc');
+    }
   };
   
   if (isLoading) {
@@ -121,16 +133,21 @@ const ArticlesPage = () => {
           </div>
           
           <div className="flex gap-2">
-            <button
-              onClick={() => handleFilterChange('latest')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                activeFilter === 'latest'
-                  ? 'bg-league-gold text-league-dark'
-                  : 'bg-league-dark/70 text-white hover:bg-league-dark'
-              }`}
-            >
-              Plus récents
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleFilterChange('latest')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  activeFilter === 'latest'
+                    ? 'bg-league-gold text-league-dark'
+                    : 'bg-league-dark/70 text-white hover:bg-league-dark'
+                }`}
+              >
+                {activeFilter === 'latest' 
+                  ? (sortDirection === 'desc' ? 'Plus récents' : 'Plus vieux')
+                  : 'Plus récents'
+                }
+              </button>
+            </div>
             <button
               onClick={() => handleFilterChange('popular')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -145,9 +162,9 @@ const ArticlesPage = () => {
         </div>
       </div>
       
-      {sortedArticles.length > 0 ? (
+      {displayedArticles.length > 0 ? (
         <div className="space-y-6">
-          {sortedArticles.map((article) => (
+          {displayedArticles.map((article) => (
             <ArticleCard 
               key={article.id} 
               id={article.id}
