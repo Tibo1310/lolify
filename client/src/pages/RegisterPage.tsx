@@ -9,13 +9,13 @@ const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | React.ReactElement | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
   
   const [registerMutation, { loading }] = useMutation(REGISTER_MUTATION, {
     onError: (error) => {
-      setError(error.message || 'Une erreur est survenue l&apos;inscription');
+      setError(error.message || <span dangerouslySetInnerHTML={{ __html: 'Une erreur est survenue l&apos;inscription' }} />);
     }
   });
 
@@ -82,7 +82,7 @@ const RegisterPage = () => {
       <div className="bg-league-dark border border-league-gold/30 rounded-lg p-8 shadow-lg">
         {error && (
           <div className="bg-red-900/20 border border-red-500 text-red-300 p-4 rounded-lg mb-6">
-            {error}
+            {typeof error === 'string' ? error : error}
           </div>
         )}
         
@@ -156,7 +156,7 @@ const RegisterPage = () => {
             className="w-full bg-league-gold text-league-dark py-2 px-4 rounded font-semibold hover:bg-league-teal transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
           >
-            {loading ? 'Inscription en cours...' : 'S&apos;inscrire'}
+            {loading ? 'Inscription en cours...' : <span dangerouslySetInnerHTML={{ __html: 'S&apos;inscrire' }} />}
           </button>
           
           <p className="text-center text-gray-400">
