@@ -92,16 +92,16 @@ const EditArticlePage = () => {
     );
   }
   
-  // Si une erreur s'est produite lors du chargement de l'article
+  // Si une erreur s&apos;est produite lors du chargement de l&apos;article
   if (articleError) {
     return (
       <div className="bg-red-900/20 border border-red-500 text-red-300 p-4 rounded-lg">
-        Une erreur est survenue lors du chargement de l'article.
+        Une erreur est survenue lors du chargement de l&apos;article.
       </div>
     );
   }
   
-  // Si l'utilisateur n'est pas autorisé à modifier cet article
+  // Si l&apos;utilisateur n&apos;est pas autorisé à modifier cet article
   const isAuthorized = user?.id === data?.article?.author.id;
   if (!isAuthorized) {
     return (
@@ -139,11 +139,11 @@ const EditArticlePage = () => {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
           </svg>
-          <span>Retour à l'article</span>
+          <span>Retour à l&apos;article</span>
         </Link>
       </div>
       
-      <h1 className="text-center mb-8">Modifier l'article</h1>
+      <h1 className="text-center mb-8">Modifier l&apos;article</h1>
       
       <div className="bg-league-dark border border-league-gold/30 rounded-lg overflow-hidden shadow-lg p-6 mb-8">
         {error && (
@@ -155,7 +155,7 @@ const EditArticlePage = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="title" className="block mb-2 font-medium">
-              Titre de l'article
+              Titre de l&apos;article
             </label>
             <input
               id="title"

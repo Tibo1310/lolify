@@ -146,7 +146,7 @@ const CreateArticlePage = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="title" className="block mb-2 font-medium">
-              Titre de l'article
+              Titre de l&apos;article
             </label>
             <input
               id="title"

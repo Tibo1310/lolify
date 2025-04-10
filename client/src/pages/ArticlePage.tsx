@@ -188,7 +188,7 @@ const ArticlePage = () => {
   if (error) {
     return (
       <div className="bg-red-900/20 border border-red-500 text-red-300 p-4 rounded-lg">
-        Une erreur est survenue lors du chargement de l'article.
+        Une erreur est survenue lors du chargement de l&apos;article.
       </div>
     );
   }
@@ -201,7 +201,7 @@ const ArticlePage = () => {
           to="/" 
           className="inline-block bg-league-gold text-league-dark font-bold py-2 px-4 rounded hover:bg-league-teal transition-colors"
         >
-          Retour à l'accueil
+          Retour à l&apos;accueil
         </Link>
       </div>
     );
