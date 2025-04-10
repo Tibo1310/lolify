@@ -179,7 +179,7 @@ const CreateArticlePage = () => {
               className="bg-league-gold text-league-dark px-6 py-3 rounded-lg font-semibold hover:bg-league-teal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
-              {loading ? 'Publication en cours...' : 'Publier l\'article'}
+              {loading ? 'Publication en cours...' : 'Publier l&apos;article'}
             </button>
           </div>
         </form>

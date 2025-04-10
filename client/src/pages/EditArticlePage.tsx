@@ -107,12 +107,12 @@ const EditArticlePage = () => {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Accès refusé</h1>
-        <p className="text-gray-300 mb-6">Vous n'êtes pas autorisé à modifier cet article.</p>
+        <p className="text-gray-300 mb-6">Vous n&apos;êtes pas autorisé à modifier cet article.</p>
         <Link 
           to={`/articles/${id}`} 
           className="inline-block bg-league-gold text-league-dark font-bold py-2 px-4 rounded hover:bg-league-teal transition-colors"
         >
-          Retour à l'article
+          Retour à l&apos;article
         </Link>
       </div>
     );

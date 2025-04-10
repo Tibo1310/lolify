@@ -39,12 +39,12 @@ const SettingsPage = () => {
     
     // Validation des champs
     if (!username.trim()) {
-      setProfileError('Le nom d\'utilisateur est requis');
+      setProfileError('Le nom d&apos;utilisateur est requis');
       return;
     }
     
     if (!email.trim()) {
-      setProfileError('L\'email est requis');
+      setProfileError('L&apos;email est requis');
       return;
     }
     
@@ -61,7 +61,7 @@ const SettingsPage = () => {
         setProfileSuccess(false);
       }, 3000);
     } catch (error) {
-      setProfileError('Une erreur s\'est produite lors de la mise à jour du profil');
+      setProfileError('Une erreur s&apos;est produite lors de la mise à jour du profil');
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +110,7 @@ const SettingsPage = () => {
         setConfirmPassword('');
       }, 3000);
     } catch (error) {
-      setPasswordError('Une erreur s\'est produite lors de la mise à jour du mot de passe');
+      setPasswordError('Une erreur s&apos;est produite lors de la mise à jour du mot de passe');
     } finally {
       setIsLoading(false);
     }
@@ -129,7 +129,7 @@ const SettingsPage = () => {
         // Rediriger vers la page d'accueil
         navigate('/');
       } catch (error) {
-        alert('Une erreur s\'est produite lors de la suppression du compte');
+        alert('Une erreur s&apos;est produite lors de la suppression du compte');
       }
     }
   };
@@ -162,7 +162,7 @@ const SettingsPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label htmlFor="username" className="block mb-2 font-medium">
-                Nom d'utilisateur
+                Nom d&apos;utilisateur
               </label>
               <input
                 id="username"

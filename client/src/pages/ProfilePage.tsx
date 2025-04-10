@@ -7,29 +7,6 @@ import ArticleCard from '../components/ArticleCard';
 import { GET_USER_PROFILE } from '../graphql/queries';
 import { UPDATE_PROFILE, DELETE_ACCOUNT } from '../graphql/mutations';
 
-interface Author {
-  id: string;
-  username: string;
-  avatar: string | null;
-}
-
-interface Article {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  author: Author;
-  likesCount: number;
-}
-
-interface UserProfile {
-  id: string;
-  username: string;
-  email: string;
-  createdAt: string;
-  avatar: string | null;
-}
-
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { username } = useParams<{ username: string }>();
@@ -144,7 +121,7 @@ const ProfilePage = () => {
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Profil non trouvé</h1>
         <Link to="/" className="text-league-gold hover:text-league-teal">
-          Retour à l'accueil
+          Retour à l&apos;accueil
         </Link>
       </div>
     );
@@ -163,7 +140,7 @@ const ProfilePage = () => {
           {isEditing ? (
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Nom d'utilisateur</label>
+                <label className="block text-sm font-medium mb-1">Nom d&apos;utilisateur</label>
                 <input
                   type="text"
                   name="username"
@@ -310,6 +287,11 @@ const ProfilePage = () => {
           </div>
         )}
       </div>
+      <p className="mt-2 text-sm">
+        LOLIFY n&apos;est pas associé à Riot Games et ne reflète pas les opinions ou les vues de Riot Games
+        ou de toute personne officiellement impliquée dans la production ou la gestion de League of Legends.
+        League of Legends et Riot Games sont des marques déposées de Riot Games, Inc.
+      </p>
     </div>
   );
 };

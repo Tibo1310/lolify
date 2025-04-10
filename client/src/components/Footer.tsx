@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
   return (
     <footer className="bg-league-dark py-8 mt-auto">
       <div className="container mx-auto px-4">
@@ -79,7 +77,7 @@ const Footer = () => {
             Ce site n&apos;est pas affilié à Riot Games.
           </p>
           <p className="mt-2 text-sm">
-            LOLIFY n'est pas associé à Riot Games et ne reflète pas les opinions ou les vues de Riot Games
+            LOLIFY n&apos;est pas associé à Riot Games et ne reflète pas les opinions ou les vues de Riot Games
             ou de toute personne officiellement impliquée dans la production ou la gestion de League of Legends.
             League of Legends et Riot Games sont des marques déposées de Riot Games, Inc.
           </p>

@@ -38,7 +38,7 @@ const LoginPage = () => {
     
     // Validation simple
     if (!email.trim()) {
-      setError('L\'email est requis');
+      setError('L&apos;email est requis');
       return;
     }
     
@@ -136,7 +136,7 @@ const LoginPage = () => {
           <p className="text-center text-gray-400">
             Pas encore de compte ?{' '}
             <Link to="/register" className="text-league-teal hover:text-league-gold">
-              S'inscrire
+              S&apos;inscrire
             </Link>
           </p>
         </form>

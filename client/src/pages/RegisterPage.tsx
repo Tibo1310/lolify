@@ -15,7 +15,7 @@ const RegisterPage = () => {
   
   const [registerMutation, { loading }] = useMutation(REGISTER_MUTATION, {
     onError: (error) => {
-      setError(error.message || 'Une erreur est survenue lors de l\'inscription');
+      setError(error.message || 'Une erreur est survenue l&apos;inscription');
     }
   });
 
@@ -25,12 +25,12 @@ const RegisterPage = () => {
     
     // Validation des champs
     if (!username.trim()) {
-      setError('Le nom d\'utilisateur est requis');
+      setError('Le nom d&apos;utilisateur est requis');
       return;
     }
 
     if (!email.trim()) {
-      setError('L\'email est requis');
+      setError('L&apos;email est requis');
       return;
     }
 
@@ -67,11 +67,11 @@ const RegisterPage = () => {
         login(token, userData);
         navigate('/');
       } else {
-        setError('Une erreur est survenue lors de l\'inscription');
+        setError('Une erreur est survenue l&apos;inscription');
       }
     } catch (err) {
       // L'erreur est déjà gérée par onError dans useMutation
-      console.error('Erreur d\'inscription:', err);
+      console.error('Erreur d&apos;inscription:', err);
     }
   };
 
@@ -89,7 +89,7 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="username" className="block mb-2 font-medium">
-              Nom d'utilisateur
+              Nom d&apos;utilisateur
             </label>
             <input
               id="username"
@@ -97,7 +97,7 @@ const RegisterPage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full"
-              placeholder="Votre nom d'utilisateur"
+              placeholder="Votre nom d&apos;utilisateur"
               required
               disabled={loading}
             />
@@ -156,7 +156,7 @@ const RegisterPage = () => {
             className="w-full bg-league-gold text-league-dark py-2 px-4 rounded font-semibold hover:bg-league-teal transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
           >
-            {loading ? 'Inscription en cours...' : 'S\'inscrire'}
+            {loading ? 'Inscription en cours...' : 'S&apos;inscrire'}
           </button>
           
           <p className="text-center text-gray-400">

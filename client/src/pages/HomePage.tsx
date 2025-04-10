@@ -127,7 +127,7 @@ const HomePage = () => {
         <div className="bg-league-dark border border-league-gold/30 rounded-lg p-6">
           <h3 className="text-xl font-bold mb-4">Rejoignez la communauté</h3>
           <p className="text-gray-300 mb-4">
-            Partagez vos connaissances, posez des questions et connectez-vous avec d'autres joueurs passionnés de League of Legends.
+            Partagez vos connaissances, posez des questions et connectez-vous avec d&apos;autres joueurs passionnés de League of Legends.
           </p>
           {!user && (
             <Link 

@@ -149,7 +149,7 @@ const ArticlePage = () => {
         }
       });
     } catch (error) {
-      console.error('Erreur lors de l\'ajout du commentaire :', error);
+      console.error('Erreur lors de l&apos;ajout du commentaire :', error);
     } finally {
       setAddingComment(false);
     }
