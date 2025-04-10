@@ -74,7 +74,10 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {currentYear} LOLIFY. Tous droits réservés.</p>
+          <p className="text-sm text-gray-400">
+            &copy; {new Date().getFullYear()} Lolify. Tous droits réservés.
+            Ce site n&apos;est pas affilié à Riot Games.
+          </p>
           <p className="mt-2 text-sm">
             LOLIFY n'est pas associé à Riot Games et ne reflète pas les opinions ou les vues de Riot Games
             ou de toute personne officiellement impliquée dans la production ou la gestion de League of Legends.

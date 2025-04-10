@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useQuery } from '@apollo/client';
 import ArticleCard from '../components/ArticleCard';
-import { useAuth } from '../context/AuthContext';
 import { GET_ARTICLES } from '../graphql/queries';
 
 interface Author {
@@ -99,17 +98,14 @@ const HomePage = () => {
         
         {articles.length > 0 ? (
           <div className="space-y-6">
-            {articles.map((article: Article) => (
-              <ArticleCard 
-                key={article.id} 
-                id={article.id}
-                title={article.title}
-                content={article.content}
-                createdAt={article.createdAt}
-                author={article.author}
-                likesCount={article.likesCount}
-              />
-            ))}
+            <div className="grid grid-cols-1 gap-6">
+              {articles.map((article) => (
+                <ArticleCard
+                  key={article.id}
+                  article={article}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="text-center py-12">

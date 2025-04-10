@@ -138,8 +138,8 @@ const CreateArticlePage = () => {
       
       <div className="bg-league-dark border border-league-gold/30 rounded-lg overflow-hidden shadow-lg p-6 mb-8">
         {error && (
-          <div className="bg-red-900/20 border border-red-500 text-red-300 p-4 rounded-lg mb-6">
-            {error}
+          <div className="text-red-500 mb-4">
+            Une erreur s&apos;est produite l&apos;article.
           </div>
         )}
         

@@ -32,6 +32,8 @@ const ArticlesPage = () => {
   const [debouncedAuthorSearch, setDebouncedAuthorSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('latest');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [offset, setOffset] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Debounce pour la recherche d'articles
   useEffect(() => {
@@ -51,7 +53,7 @@ const ArticlesPage = () => {
     return () => clearTimeout(timer);
   }, [authorQuery]);
   
-  const { loading, error, data } = useQuery<ArticlesData>(GET_ARTICLES, {
+  const { loading, error, data, fetchMore } = useQuery<ArticlesData>(GET_ARTICLES, {
     variables: { 
       offset: 0, 
       limit: 50,
@@ -89,6 +91,14 @@ const ArticlesPage = () => {
       // Réinitialiser le tri en ordre décroissant pour les nouveaux filtres
       setSortDirection('desc');
     }
+  };
+  
+  const handleLoadMore = () => {
+    const newOffset = offset + 50;
+    setOffset(newOffset);
+    fetchMore({
+      variables: { offset: newOffset, limit: 50 }
+    });
   };
   
   if (loading) {
@@ -202,17 +212,14 @@ const ArticlesPage = () => {
       
       {displayedArticles.length > 0 ? (
         <div className="space-y-6">
-          {displayedArticles.map((article) => (
-            <ArticleCard 
-              key={article.id} 
-              id={article.id}
-              title={article.title}
-              content={article.content}
-              createdAt={article.createdAt}
-              author={article.author}
-              likesCount={article.likesCount}
-            />
-          ))}
+          <div className="grid grid-cols-1 gap-6">
+            {sortedArticles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                article={article}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         <div className="text-center py-12">

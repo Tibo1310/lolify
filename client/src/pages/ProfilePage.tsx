@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../context/AuthContext';
 import { formatDate } from '../utils/dateUtils';
 import ArticleCard from '../components/ArticleCard';
-import { GET_USER_PROFILE, GET_ARTICLES } from '../graphql/queries';
+import { GET_USER_PROFILE } from '../graphql/queries';
 import { UPDATE_PROFILE, DELETE_ACCOUNT } from '../graphql/mutations';
 
 interface Author {
@@ -151,8 +151,8 @@ const ProfilePage = () => {
       <div className="bg-league-dark border border-league-gold/30 rounded-lg overflow-hidden shadow-lg mb-8">
         <div className="p-6">
           {error && (
-            <div className="mb-4 bg-red-900/20 border border-red-500 text-red-300 p-4 rounded">
-              {error}
+            <div className="text-red-500 mb-4">
+              Une erreur s&apos;est produite lors de la mise à jour du profil.
             </div>
           )}
 
@@ -292,16 +292,11 @@ const ProfilePage = () => {
         </div>
         
         {sortedArticles.length > 0 ? (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-6">
             {sortedArticles.map((article) => (
-              <ArticleCard 
-                key={article.id} 
-                id={article.id}
-                title={article.title}
-                content={article.content}
-                createdAt={article.createdAt}
-                author={article.author}
-                likesCount={article.likesCount}
+              <ArticleCard
+                key={article.id}
+                article={article}
               />
             ))}
           </div>

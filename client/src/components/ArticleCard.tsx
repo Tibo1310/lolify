@@ -21,21 +21,16 @@ interface Article {
 }
 
 interface ArticleCardProps {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  author: Author;
-  likesCount: number;
+  article: Article;
+  showActions?: boolean;
 }
 
-const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: ArticleCardProps) => {
-  const navigate = useNavigate();
+const ArticleCard = ({ article, showActions = true }: ArticleCardProps) => {
   const { user } = useAuth();
-  const isAuthor = user?.username === author.username;
+  const isAuthor = user?.id === article.author.id;
 
   console.log('Current user:', user); // Debug
-  console.log('Article author:', author); // Debug
+  console.log('Article author:', article.author); // Debug
   console.log('Is author?', isAuthor); // Debug
 
   const [deleteArticle] = useMutation(DELETE_ARTICLE, {
@@ -51,7 +46,7 @@ const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: Arti
           query: GET_ARTICLES,
           variables: { offset: 0, limit: 50 },
           data: {
-            articles: existingArticles.articles.filter(article => article.id !== id)
+            articles: existingArticles.articles.filter(a => a.id !== article.id)
           }
         });
       }
@@ -63,15 +58,15 @@ const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: Arti
   });
 
   // Limiter le contenu à 150 caractères
-  const truncatedContent = content.length > 150 
-    ? `${content.substring(0, 150)}...` 
-    : content;
+  const truncatedContent = article.content.length > 150 
+    ? `${article.content.substring(0, 150)}...` 
+    : article.content;
 
   const handleDelete = async () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
       try {
         await deleteArticle({
-          variables: { id }
+          variables: { id: article.id }
         });
       } catch (err) {
         console.error('Erreur lors de la suppression:', err);
@@ -84,29 +79,29 @@ const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: Arti
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            {author.avatar ? (
+            {article.author.avatar ? (
               <img 
-                src={author.avatar} 
-                alt={`Avatar de ${author.username}`} 
+                src={article.author.avatar} 
+                alt={`Avatar de ${article.author.username}`} 
                 className="w-10 h-10 rounded-full mr-3 object-cover" 
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-league-blue flex items-center justify-center mr-3">
-                <span className="text-league-gold font-bold">{author.username.charAt(0).toUpperCase()}</span>
+                <span className="text-league-gold font-bold">{article.author.username.charAt(0).toUpperCase()}</span>
               </div>
             )}
             <div>
-              <Link to={`/profile/${author.username}`} className="text-league-teal hover:text-league-gold">
-                {author.username}
+              <Link to={`/profile/${article.author.username}`} className="text-league-teal hover:text-league-gold">
+                {article.author.username}
               </Link>
-              <p className="text-gray-400 text-sm">{formatDate(createdAt)}</p>
+              <p className="text-gray-400 text-sm">{formatDate(article.createdAt)}</p>
             </div>
           </div>
           
-          {isAuthor && (
+          {showActions && isAuthor && (
             <div className="flex gap-2">
               <Link
-                to={`/articles/${id}/edit`}
+                to={`/articles/${article.id}/edit`}
                 className="text-league-teal hover:text-league-gold"
                 title="Modifier l'article"
               >
@@ -128,8 +123,8 @@ const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: Arti
         </div>
 
         <h2 className="text-xl font-bold mb-2">
-          <Link to={`/articles/${id}`} className="hover:text-league-teal">
-            {title}
+          <Link to={`/articles/${article.id}`} className="hover:text-league-teal">
+            {article.title}
           </Link>
         </h2>
         
@@ -137,7 +132,7 @@ const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: Arti
         
         <div className="flex justify-between items-center">
           <Link 
-            to={`/articles/${id}`}
+            to={`/articles/${article.id}`}
             className="text-league-teal hover:text-league-gold font-medium"
           >
             Lire la suite →
@@ -156,7 +151,7 @@ const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: Arti
                 clipRule="evenodd" 
               />
             </svg>
-            <span>{likesCount}</span>
+            <span>{article.likesCount}</span>
           </div>
         </div>
       </div>

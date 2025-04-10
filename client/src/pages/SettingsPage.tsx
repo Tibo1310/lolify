@@ -147,8 +147,8 @@ const SettingsPage = () => {
         <h2 className="text-xl font-bold mb-4">Informations personnelles</h2>
         
         {profileError && (
-          <div className="bg-red-900/20 border border-red-500 text-red-300 p-4 rounded-lg mb-6">
-            {profileError}
+          <div className="text-red-500 mb-4">
+            Une erreur s&apos;est produite lors de la mise à jour du profil.
           </div>
         )}
         
