@@ -32,8 +32,6 @@ const ArticlesPage = () => {
   const [debouncedAuthorSearch, setDebouncedAuthorSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('latest');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [offset, setOffset] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
   
   // Debounce pour la recherche d'articles
   useEffect(() => {
@@ -42,7 +40,7 @@ const ArticlesPage = () => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, setDebouncedSearch]);
 
   // Debounce pour la recherche d'auteurs
   useEffect(() => {
@@ -51,9 +49,9 @@ const ArticlesPage = () => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [authorQuery]);
+  }, [authorQuery, setDebouncedAuthorSearch]);
   
-  const { loading, error, data, fetchMore } = useQuery<ArticlesData>(GET_ARTICLES, {
+  const { loading, error, data } = useQuery<ArticlesData>(GET_ARTICLES, {
     variables: { 
       offset: 0, 
       limit: 50,
@@ -78,10 +76,6 @@ const ArticlesPage = () => {
     }
   });
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-  
   const handleFilterChange = (filter: string) => {
     if (filter === activeFilter) {
       // Si on clique sur le filtre actif, on inverse juste le tri
@@ -91,14 +85,6 @@ const ArticlesPage = () => {
       // Réinitialiser le tri en ordre décroissant pour les nouveaux filtres
       setSortDirection('desc');
     }
-  };
-  
-  const handleLoadMore = () => {
-    const newOffset = offset + 50;
-    setOffset(newOffset);
-    fetchMore({
-      variables: { offset: newOffset, limit: 50 }
-    });
   };
   
   if (loading) {
@@ -116,9 +102,6 @@ const ArticlesPage = () => {
       </div>
     );
   }
-
-  // Pas de limite sur le nombre d'articles affichés
-  const displayedArticles = sortedArticles;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -210,7 +193,7 @@ const ArticlesPage = () => {
         </div>
       </div>
       
-      {displayedArticles.length > 0 ? (
+      {sortedArticles.length > 0 ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
             {sortedArticles.map((article) => (
