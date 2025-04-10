@@ -145,7 +145,11 @@ export const userResolvers = {
       }
 
       // Préparer les données de mise à jour
-      const updateData: any = {};
+      const updateData: {
+        username?: string;
+        email?: string;
+        password?: string;
+      } = {};
       if (input.username) updateData.username = input.username;
       if (input.email) updateData.email = input.email;
       if (input.newPassword) {

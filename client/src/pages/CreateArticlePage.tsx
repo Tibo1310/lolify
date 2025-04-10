@@ -4,6 +4,18 @@ import { useMutation } from '@apollo/client';
 import { CREATE_ARTICLE_MUTATION } from '../graphql/mutations';
 import { GET_ARTICLES } from '../graphql/queries';
 
+interface Article {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  author: {
+    id: string;
+    username: string;
+    avatar: string | null;
+  };
+}
+
 interface CreateArticleData {
   createArticle: {
     id: string;
@@ -41,7 +53,7 @@ const CreateArticlePage = () => {
         const newArticle = data.createArticle;
         
         try {
-          const existingArticles = cache.readQuery<{ articles: any[] }>({
+          const existingArticles = cache.readQuery<{ articles: Article[] }>({
             query: GET_ARTICLES,
             variables: { offset: 0, limit: 10 },
           });

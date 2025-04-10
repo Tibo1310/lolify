@@ -11,6 +11,15 @@ interface Author {
   avatar?: string | null;
 }
 
+interface Article {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  author: Author;
+  likesCount: number;
+}
+
 interface ArticleCardProps {
   id: string;
   title: string;
@@ -32,7 +41,7 @@ const ArticleCard = ({ id, title, content, createdAt, author, likesCount }: Arti
   const [deleteArticle] = useMutation(DELETE_ARTICLE, {
     update(cache) {
       // Mettre à jour le cache en supprimant l'article
-      const existingArticles = cache.readQuery<{ articles: any[] }>({
+      const existingArticles = cache.readQuery<{ articles: Article[] }>({
         query: GET_ARTICLES,
         variables: { offset: 0, limit: 50 }
       });
