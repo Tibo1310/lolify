@@ -17,7 +17,11 @@ export const comparePasswords = async (
 };
 
 // Generate a JWT token
-export const generateToken = (user: UserModel): string => {
+export const generateToken = (user: NonNullable<UserModel>): string => {
+  if (!user || !user.id) {
+    throw new Error('Invalid user data for token generation');
+  }
+
   const jwtSecret = process.env.JWT_SECRET || 'fallback-secret';
   
   return jwt.sign(

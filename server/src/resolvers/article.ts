@@ -11,53 +11,51 @@ export const articleResolvers = {
       }
       return article;
     },
-    articles: async (
-      _: unknown,
-      { offset = 0, limit = 10, authorId, search }: { offset?: number; limit?: number; authorId?: string; search?: string },
-      { prisma }: Context
-    ) => {
-      // Construire la condition where
-      let where: Prisma.ArticleWhereInput = {};
-      
-      // Ajouter le filtre par auteur si spécifié
-      if (authorId) {
-        where.authorId = authorId;
+    articles: async (parent: null, args: { offset?: number; limit?: number; authorId?: string; search?: string; authorUsername?: string }, context: Context) => {
+      const where: Prisma.ArticleWhereInput = {};
+
+      if (args.authorId) {
+        where.authorId = args.authorId;
       }
-      
-      // Ajouter la recherche si spécifiée
-      if (search) {
-        const searchTerm = search.toLowerCase();
+
+      if (args.search) {
+        const searchTerm = args.search.toLowerCase();
         where.OR = [
           { title: { contains: searchTerm } },
           { content: { contains: searchTerm } }
         ];
       }
-      
-      // Si une recherche est effectuée, on doit d'abord récupérer tous les articles
-      // puis filtrer ceux dont l'auteur correspond à la recherche
-      const articles = await prisma.article.findMany({
-        where,
-        skip: offset,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          author: true,
-          likes: true,
-          comments: true
-        }
-      });
 
-      // Si une recherche est effectuée, filtrer également par nom d'auteur
-      if (search) {
-        const searchTerm = search.toLowerCase();
-        return articles.filter(article => 
-          article.title.toLowerCase().includes(searchTerm) ||
-          article.content.toLowerCase().includes(searchTerm) ||
-          article.author.username.toLowerCase().includes(searchTerm)
-        );
+      if (args.authorUsername) {
+        const authorTerm = args.authorUsername.toLowerCase();
+        where.author = {
+          username: {
+            contains: authorTerm
+          }
+        };
       }
 
-      return articles;
+      return context.prisma.article.findMany({
+        where,
+        include: {
+          author: true,
+          likes: {
+            include: {
+              user: true
+            }
+          },
+          comments: {
+            include: {
+              author: true
+            }
+          }
+        },
+        skip: args.offset || 0,
+        take: args.limit || 50,
+        orderBy: {
+          createdAt: 'desc'
+        }
+      });
     },
   },
 

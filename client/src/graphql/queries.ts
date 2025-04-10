@@ -1,18 +1,18 @@
 import { gql } from '@apollo/client';
 
 export const GET_ARTICLES = gql`
-  query GetArticles($offset: Int, $limit: Int, $search: String, $authorId: ID) {
-    articles(offset: $offset, limit: $limit, search: $search, authorId: $authorId) {
+  query GetArticles($offset: Int, $limit: Int, $search: String, $authorUsername: String) {
+    articles(offset: $offset, limit: $limit, search: $search, authorUsername: $authorUsername) {
       id
       title
       content
       createdAt
-      likesCount
       author {
         id
         username
         avatar
       }
+      likesCount
     }
   }
 `;

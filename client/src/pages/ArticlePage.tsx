@@ -6,7 +6,12 @@ import CommentItem from '../components/CommentItem';
 import CommentForm from '../components/CommentForm';
 import { useAuth } from '../context/AuthContext';
 import { GET_ARTICLE } from '../graphql/queries';
-import { TOGGLE_LIKE_MUTATION, ADD_COMMENT_MUTATION, DELETE_ARTICLE } from '../graphql/mutations';
+import { 
+  TOGGLE_LIKE_MUTATION, 
+  ADD_COMMENT_MUTATION, 
+  DELETE_ARTICLE,
+  DELETE_COMMENT_MUTATION 
+} from '../graphql/mutations';
 
 interface Like {
   id: string;
@@ -93,6 +98,13 @@ const ArticlePage = () => {
       navigate('/');
     }
   });
+
+  const [deleteComment] = useMutation(DELETE_COMMENT_MUTATION, {
+    refetchQueries: [{
+      query: GET_ARTICLE,
+      variables: { id }
+    }]
+  });
   
   // State for loading states
   const [addingComment, setAddingComment] = useState(false);
@@ -152,6 +164,16 @@ const ArticlePage = () => {
       } catch (error) {
         console.error('Erreur lors de la suppression :', error);
       }
+    }
+  };
+  
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment({
+        variables: { id: commentId }
+      });
+    } catch (error) {
+      console.error('Erreur lors de la suppression du commentaire:', error);
     }
   };
   
@@ -230,19 +252,19 @@ const ArticlePage = () => {
             <div className="flex items-center gap-3">
               <button 
                 onClick={handleLike}
-                className={`flex items-center gap-1 ${hasLiked ? 'text-league-gold' : 'text-gray-400'} hover:text-league-gold transition-colors`}
+                className="flex items-center gap-1 hover:opacity-80 transition-colors"
                 disabled={likingArticle || !isAuthenticated}
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
                   className="h-6 w-6" 
-                  fill={hasLiked ? 'currentColor' : 'none'}
+                  fill={hasLiked ? '#ef4444' : 'none'}
                   viewBox="0 0 24 24" 
-                  stroke="currentColor"
+                  stroke={hasLiked ? '#ef4444' : 'black'}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
-                <span>{article.likesCount}</span>
+                <span className="text-black dark:text-white">{article.likesCount}</span>
               </button>
               
               <span className="text-gray-400">|</span>
@@ -281,37 +303,34 @@ const ArticlePage = () => {
         <div className="p-6">
           <h2 className="text-xl font-bold mb-6">Commentaires</h2>
           
-          {isAuthenticated ? (
-            <CommentForm 
-              articleId={article.id}
-              onSubmit={handleAddComment}
-              loading={addingComment}
-            />
-          ) : (
-            <div className="text-center py-4 bg-league-dark/40 border border-league-gold/10 rounded mb-6">
-              <Link to="/login" className="text-league-teal hover:text-league-gold">
-                Connectez-vous pour commenter
-              </Link>
-            </div>
-          )}
-          
-          {article.comments.length > 0 ? (
-            <div className="space-y-6">
+          <div className="space-y-6 mt-8">
+            <h2 className="text-xl font-bold mb-4">Commentaires ({article.comments.length})</h2>
+            
+            {isAuthenticated ? (
+              <CommentForm 
+                articleId={article.id} 
+                onSubmit={handleAddComment}
+                loading={addingComment}
+              />
+            ) : (
+              <p className="text-gray-400 mb-4">
+                <Link to="/login" className="text-league-teal hover:text-league-gold">Connectez-vous</Link> pour laisser un commentaire
+              </p>
+            )}
+            
+            <div className="space-y-4">
               {article.comments.map((comment) => (
-                <CommentItem 
+                <CommentItem
                   key={comment.id}
                   id={comment.id}
                   content={comment.content}
                   createdAt={comment.createdAt}
                   author={comment.author}
+                  onDelete={handleDeleteComment}
                 />
               ))}
             </div>
-          ) : (
-            <div className="text-center py-4 bg-league-dark/40 border border-league-gold/10 rounded">
-              <p className="text-gray-400">Aucun commentaire pour le moment</p>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

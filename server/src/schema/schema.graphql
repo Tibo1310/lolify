@@ -80,10 +80,10 @@ input UpdateProfileInput {
 
 type Query {
   me: User
-  user(id: ID, username: String): User
+  user(username: String!): User
   users: [User!]!
   article(id: ID!): Article
-  articles(offset: Int, limit: Int, authorId: ID, search: String): [Article!]!
+  articles(offset: Int, limit: Int, authorId: ID, search: String, authorUsername: String): [Article!]!
   comments(articleId: ID!): [Comment!]!
 }
 

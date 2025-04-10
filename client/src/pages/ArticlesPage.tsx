@@ -27,11 +27,13 @@ interface ArticlesData {
 const ArticlesPage = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [authorQuery, setAuthorQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [debouncedAuthorSearch, setDebouncedAuthorSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('latest');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   
-  // Effet pour le debounce de la recherche
+  // Debounce pour la recherche d'articles
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
@@ -39,37 +41,48 @@ const ArticlesPage = () => {
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // Debounce pour la recherche d'auteurs
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedAuthorSearch(authorQuery);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [authorQuery]);
   
-  const { loading: isLoading, error, data } = useQuery<ArticlesData>(GET_ARTICLES, {
+  const { loading, error, data } = useQuery<ArticlesData>(GET_ARTICLES, {
     variables: { 
       offset: 0, 
       limit: 50,
-      search: debouncedSearch || undefined
-    },
+      search: debouncedSearch || undefined,
+      authorUsername: debouncedAuthorSearch || undefined
+    }
   }); 
   
-  // Trier les articles en fonction du filtre actif
-  const sortedArticles = data?.articles ? [...data.articles].sort((a, b) => {
-    const multiplier = sortDirection === 'desc' ? 1 : -1;
-    
-    if (activeFilter === 'latest') {
-      return multiplier * (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    } else if (activeFilter === 'popular') {
-      return multiplier * (b.likesCount - a.likesCount);
-    }
-    return 0;
-  }) : [];
-
-  // Si le filtre est "popular", ne garder que les 5 premiers articles
-  const displayedArticles = activeFilter === 'popular' ? sortedArticles.slice(0, 5) : sortedArticles;
+  const articles = data?.articles || [];
   
+  // Trier les articles
+  const sortedArticles = [...articles].sort((a, b) => {
+    if (activeFilter === 'latest') {
+      return sortDirection === 'desc'
+        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    } else {
+      // Pour le filtre "popular", trier par nombre de likes
+      return sortDirection === 'desc'
+        ? b.likesCount - a.likesCount
+        : a.likesCount - b.likesCount;
+    }
+  });
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
   
   const handleFilterChange = (filter: string) => {
-    if (filter === 'latest' && activeFilter === 'latest') {
-      // Si on clique sur le filtre actif "latest", on inverse juste le tri
+    if (filter === activeFilter) {
+      // Si on clique sur le filtre actif, on inverse juste le tri
       setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
     } else {
       setActiveFilter(filter);
@@ -78,7 +91,7 @@ const ArticlesPage = () => {
     }
   };
   
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center my-12">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-league-gold"></div>
@@ -93,6 +106,9 @@ const ArticlesPage = () => {
       </div>
     );
   }
+
+  // Pas de limite sur le nombre d'articles affichés
+  const displayedArticles = sortedArticles;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -114,22 +130,41 @@ const ArticlesPage = () => {
       
       <div className="mb-8">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-grow">
-            <input
-              type="text"
-              placeholder="Rechercher un article..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-league-dark/70 border border-league-gold/30 focus:border-league-gold focus:outline-none text-white"
-            />
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" 
-              viewBox="0 0 20 20" 
-              fill="currentColor"
-            >
-              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-            </svg>
+          <div className="relative flex gap-4 mb-6">
+            <div className="relative flex-1">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+              >
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Rechercher un article..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-league-dark/70 border border-league-gold/30 focus:border-league-gold focus:outline-none text-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="relative flex-1">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+              >
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Rechercher un auteur..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-league-dark/70 border border-league-gold/30 focus:border-league-gold focus:outline-none text-white"
+                value={authorQuery}
+                onChange={(e) => setAuthorQuery(e.target.value)}
+              />
+            </div>
           </div>
           
           <div className="flex gap-2">
@@ -156,7 +191,10 @@ const ArticlesPage = () => {
                   : 'bg-league-dark/70 text-white hover:bg-league-dark'
               }`}
             >
-              Plus populaires
+              {activeFilter === 'popular' 
+                ? (sortDirection === 'desc' ? 'Plus populaires' : 'Moins populaires')
+                : 'Plus populaires'
+              }
             </button>
           </div>
         </div>
