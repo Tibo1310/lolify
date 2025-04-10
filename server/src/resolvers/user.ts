@@ -109,6 +109,81 @@ export const userResolvers = {
         user,
       };
     },
+
+    updateProfile: async (
+      _: unknown,
+      { input }: { input: { username?: string; email?: string; currentPassword: string; newPassword?: string } },
+      { prisma, currentUser }: Context
+    ) => {
+      if (!currentUser) {
+        throw new Error('Vous devez être connecté pour mettre à jour votre profil');
+      }
+
+      // Vérifier le mot de passe actuel
+      const passwordValid = await comparePasswords(input.currentPassword, currentUser.password);
+      if (!passwordValid) {
+        throw new Error('Mot de passe actuel incorrect');
+      }
+
+      // Vérifier si le nouveau nom d'utilisateur ou email est déjà utilisé
+      if (input.username || input.email) {
+        const existingUser = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { username: input.username },
+              { email: input.email }
+            ],
+            NOT: {
+              id: currentUser.id
+            }
+          }
+        });
+
+        if (existingUser) {
+          throw new Error('Ce nom d\'utilisateur ou email est déjà utilisé');
+        }
+      }
+
+      // Préparer les données de mise à jour
+      const updateData: any = {};
+      if (input.username) updateData.username = input.username;
+      if (input.email) updateData.email = input.email;
+      if (input.newPassword) {
+        updateData.password = await hashPassword(input.newPassword);
+      }
+
+      // Mettre à jour l'utilisateur
+      const updatedUser = await prisma.user.update({
+        where: { id: currentUser.id },
+        data: updateData
+      });
+
+      return updatedUser;
+    },
+
+    deleteAccount: async (
+      _: unknown,
+      { password }: { password: string },
+      { prisma, currentUser }: Context
+    ) => {
+      if (!currentUser) {
+        throw new Error('Vous devez être connecté pour supprimer votre compte');
+      }
+
+      // Vérifier le mot de passe
+      const passwordValid = await comparePasswords(password, currentUser.password);
+
+      if (!passwordValid) {
+        throw new Error('Mot de passe incorrect');
+      }
+
+      // Supprimer l'utilisateur
+      await prisma.user.delete({
+        where: { id: currentUser.id },
+      });
+
+      return true;
+    },
   },
 
   User: {
