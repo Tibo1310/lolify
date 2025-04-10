@@ -52,9 +52,13 @@ const ProfilePage = () => {
 
   // Mutation pour mettre à jour le profil
   const [updateProfile] = useMutation(UPDATE_PROFILE, {
-    onCompleted: () => {
+    onCompleted: (data) => {
       setIsEditing(false);
       setError(null);
+      // Rediriger vers le nouveau nom d'utilisateur
+      if (data.updateProfile.username !== username) {
+        navigate(`/profile/${data.updateProfile.username}`);
+      }
     },
     onError: (error) => {
       setError(error.message);
