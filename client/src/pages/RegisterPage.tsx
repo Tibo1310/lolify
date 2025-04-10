@@ -25,12 +25,12 @@ const RegisterPage = () => {
     
     // Validation des champs
     if (!username.trim()) {
-      setError('Le nom d&apos;utilisateur est requis');
+      setError(<span dangerouslySetInnerHTML={{ __html: 'Le nom d&apos;utilisateur est requis' }} />);
       return;
     }
 
     if (!email.trim()) {
-      setError('L&apos;email est requis');
+      setError(<span dangerouslySetInnerHTML={{ __html: 'L&apos;email est requis' }} />);
       return;
     }
 
@@ -67,7 +67,7 @@ const RegisterPage = () => {
         login(token, userData);
         navigate('/');
       } else {
-        setError('Une erreur est survenue l&apos;inscription');
+        setError(<span dangerouslySetInnerHTML={{ __html: 'Une erreur est survenue l&apos;inscription' }} />);
       }
     } catch (err) {
       // L'erreur est déjà gérée par onError dans useMutation
@@ -89,7 +89,7 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="username" className="block mb-2 font-medium">
-              Nom d&apos;utilisateur
+              <span dangerouslySetInnerHTML={{ __html: 'Nom d&apos;utilisateur' }} />
             </label>
             <input
               id="username"
