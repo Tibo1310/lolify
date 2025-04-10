@@ -29,13 +29,13 @@ const EditArticlePage = () => {
   const [content, setContent] = useState('');
   const [error, setError] = useState<string | null>(null);
   
-  // Fetch article data
+  // Récupération des données de l'article
   const { loading: articleLoading, error: articleError, data } = useQuery<ArticleData>(GET_ARTICLE, {
     variables: { id },
     skip: !id
   });
   
-  // Update article mutation
+  // Mutation pour mettre à jour l'article
   const [updateArticle, { loading: updateLoading }] = useMutation(UPDATE_ARTICLE_MUTATION, {
     onCompleted: () => {
       navigate(`/articles/${id}`);
@@ -45,7 +45,7 @@ const EditArticlePage = () => {
     }
   });
   
-  // Load article data when available
+  // Récupération des données de l'article lorsqu'elles sont disponibles
   useEffect(() => {
     if (data?.article) {
       setTitle(data.article.title);

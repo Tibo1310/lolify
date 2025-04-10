@@ -49,7 +49,7 @@ const CreateArticlePage = () => {
       update(cache, { data }) {
         if (!data) return;
         
-        // Mettre à jour le cache Apollo pour inclure le nouvel article
+        // Mise à jour du cache Apollo pour inclure le nouvel article
         const newArticle = data.createArticle;
         
         try {
@@ -90,7 +90,7 @@ const CreateArticlePage = () => {
     }
     
     try {
-      // Appeler la mutation de création d'article
+      // Appele de la mutation de création d'article
       const result = await createArticle({
         variables: {
           input: {
@@ -100,7 +100,7 @@ const CreateArticlePage = () => {
         }
       });
 
-      // Rediriger vers la page de l'article créé
+      // Redirection vers la page de l'article créé
       if (result?.data?.createArticle) {
         navigate(`/articles/${result.data.createArticle.id}`);
       }
@@ -109,7 +109,7 @@ const CreateArticlePage = () => {
     }
   };
   
-  // Formatage Markdown - aide à l'utilisateur
+  // Aide pour créer les articles
   const markdownTips = [
     { description: 'Titre', syntax: '# Titre' },
     { description: 'Sous-titre', syntax: '## Sous-titre' },

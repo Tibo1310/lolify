@@ -35,7 +35,7 @@ const ArticleCard = ({ article, showActions = true }: ArticleCardProps) => {
 
   const [deleteArticle] = useMutation(DELETE_ARTICLE, {
     update(cache) {
-      // Mettre à jour le cache en supprimant l'article
+      // Mise à jour du cache en supprimant l'article
       const existingArticles = cache.readQuery<{ articles: Article[] }>({
         query: GET_ARTICLES,
         variables: { offset: 0, limit: 50 }
@@ -60,7 +60,7 @@ const ArticleCard = ({ article, showActions = true }: ArticleCardProps) => {
     }
   });
 
-  // Limiter le contenu à 150 caractères
+  // Limitation du contenu à 150 caractères
   const truncatedContent = article.content.length > 150 
     ? `${article.content.substring(0, 150)}...` 
     : article.content;

@@ -55,7 +55,7 @@ const ArticlePage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   
-  // Fetch article data
+  // Récupération des données de l'article
   const { loading, error, data } = useQuery<ArticleData>(GET_ARTICLE, {
     variables: { id },
     skip: !id
@@ -106,7 +106,7 @@ const ArticlePage = () => {
     }]
   });
   
-  // State for loading states
+  // State pour les états de chargement
   const [addingComment, setAddingComment] = useState(false);
   const [likingArticle, setLikingArticle] = useState(false);
   

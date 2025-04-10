@@ -2,13 +2,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserModel } from '../types/models';
 
-// Hash a password
+// Hash le mot de passe
 export const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt(10);
   return bcrypt.hash(password, salt);
 };
 
-// Compare a password with a hash
+// Compare un mot de passe avec un hash
 export const comparePasswords = async (
   password: string,
   hash: string
@@ -16,7 +16,7 @@ export const comparePasswords = async (
   return bcrypt.compare(password, hash);
 };
 
-// Generate a JWT token
+// Génère un token JWT
 export const generateToken = (user: NonNullable<UserModel>): string => {
   if (!user || !user.id) {
     throw new Error('Invalid user data for token generation');

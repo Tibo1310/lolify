@@ -16,7 +16,7 @@ const CommentForm = ({ articleId, onSubmit, loading = false }: CommentFormProps)
     
     try {
       await onSubmit(content, articleId);
-      setContent(''); // Réinitialiser le champ après soumission
+      setContent(''); // Réinitialisation du champ après soumission
     } catch (error) {
       console.error('Erreur lors de l\'ajout du commentaire:', error);
     }

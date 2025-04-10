@@ -22,7 +22,7 @@ const LoginPage = () => {
     }
   });
   
-  // Rediriger si déjà connecté
+  // Redirection si l'user est déjà connecté
   useEffect(() => {
     if (user) {
       navigate('/');

@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_ME } from '../graphql/queries';
-// Nous importerons useMeLazyQuery une fois qu'il sera généré
-// import { useMeLazyQuery } from '../apollo/generated';
 
 interface User {
   id: string;
@@ -28,8 +26,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  // Nous utiliserons cette query une fois générée
-  // const [getMe] = useMeLazyQuery();
 
   const { data: userData, loading: userLoading } = useQuery(GET_ME, {
     skip: !token,

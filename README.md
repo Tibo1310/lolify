@@ -25,7 +25,7 @@ Le projet est organisé en monorepo avec deux parties principales :
 - TypeScript en mode strict
 
 ### Frontend (Client)
-- Framework moderne (React/Vue/Svelte)
+- React
 - Apollo Client
 - GraphQL Codegen pour les hooks/types
 - TypeScript en mode strict
@@ -70,7 +70,6 @@ Le projet est organisé en monorepo avec deux parties principales :
 
 - Node.js (v16+)
 - npm ou yarn
-- Base de données (PostgreSQL recommandé)
 
 ## Installation
 
@@ -89,13 +88,6 @@ cd server
 # Installer les dépendances
 npm install
 
-# Configurer la base de données
-cp .env.example .env
-# Modifier .env avec vos identifiants de base de données
-
-# Migrer la base de données
-npx prisma migrate dev
-
 # Démarrer le serveur
 npm run dev
 ```
@@ -110,6 +102,14 @@ npm install
 
 # Démarrer l'application
 npm run dev
+```
+### Prisma Studio
+```bash
+# Naviguer vers le dossier serveur
+cd server
+
+# Lancer prisma studio
+npx prisma studio
 ```
 
 ## Utilisation
@@ -144,21 +144,3 @@ npm run dev
 - Pas de pratiques telles que `as unknown as Something`
 - Tests unitaires pour les fonctionnalités critiques
 - ESLint et Prettier pour le formatage du code
-
-## Contribution
-
-1. Forkez le projet
-2. Créez votre branche de fonctionnalité (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Committez vos changements (`git commit -m 'Ajout de nouvelle-fonctionnalite'`)
-4. Poussez vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
-5. Ouvrez une Pull Request
-
-## Livrables Attendus
-
-1. Code source complet sur GitHub
-2. Documentation détaillée
-3. Présentation des fonctionnalités principales et des défis rencontrés
-
-## Licence
-
-Ce projet est sous licence MIT. 

@@ -62,14 +62,14 @@ const ArticlesPage = () => {
   
   const articles = data?.articles || [];
   
-  // Trier les articles
+  // Tri les articles
   const sortedArticles = [...articles].sort((a, b) => {
     if (activeFilter === 'latest') {
       return sortDirection === 'desc'
         ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     } else {
-      // Pour le filtre "popular", trier par nombre de likes
+      // Pour le filtre "popular" => tri par nombre de likes
       return sortDirection === 'desc'
         ? b.likesCount - a.likesCount
         : a.likesCount - b.likesCount;
@@ -78,7 +78,7 @@ const ArticlesPage = () => {
 
   const handleFilterChange = (filter: string) => {
     if (filter === activeFilter) {
-      // Si on clique sur le filtre actif, on inverse juste le tri
+      // Si on clique sur le filtre actif => on inverse juste le tri
       setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
     } else {
       setActiveFilter(filter);

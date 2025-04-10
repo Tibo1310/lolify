@@ -19,19 +19,19 @@ const SettingsPage = () => {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   
-  // Rediriger si l'utilisateur n'est pas connecté
+  // Redirection si l'utilisateur n'est pas connecté
   useEffect(() => {
     if (!user) {
       navigate('/login');
     } else {
-      // Initialiser les champs avec les infos utilisateur
+      // Initialisation des champs avec les infos utilisateur
       setUsername(user.username || '');
       setEmail(user.email || '');
       setBio(user.bio || '');
     }
   }, [user, navigate]);
   
-  // Gérer la mise à jour du profil
+  // Gestion de la mise à jour du profil
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setProfileError(null);
@@ -56,7 +56,7 @@ const SettingsPage = () => {
       
       setProfileSuccess(true);
       
-      // Réinitialiser après 3 secondes
+      // Réinitialisation après 3 secondes
       setTimeout(() => {
         setProfileSuccess(false);
       }, 3000);
@@ -67,7 +67,7 @@ const SettingsPage = () => {
     }
   };
   
-  // Gérer la mise à jour du mot de passe
+  // Gestion de la mise à jour du mot de passe
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
@@ -116,7 +116,7 @@ const SettingsPage = () => {
     }
   };
   
-  // Gérer la suppression du compte
+  // Gestion de la suppression du compte
   const handleDeleteAccount = async () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
       try {
