@@ -51,6 +51,9 @@ const ArticleCard = ({ article, showActions = true }: ArticleCardProps) => {
         });
       }
     },
+    onCompleted: () => {
+      window.location.reload();
+    },
     onError: (error) => {
       console.error('Erreur lors de la suppression:', error);
       alert('Une erreur est survenue lors de la suppression de l\'article');
