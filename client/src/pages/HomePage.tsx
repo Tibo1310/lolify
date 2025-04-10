@@ -26,7 +26,7 @@ interface ArticlesData {
 const HomePage = () => {
   const { user } = useAuth();
   const { loading: isLoading, error, data } = useQuery<ArticlesData>(GET_ARTICLES, {
-    variables: { offset: 0, limit: 10 },
+    variables: { offset: 0, limit: 3 },
   });
   
   if (isLoading) {
